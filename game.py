@@ -9,6 +9,7 @@ from __future__ import division
 import pygame
 import pygame.freetype
 from random import randrange, choice
+import math
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, color, direction, speed, container):
@@ -56,6 +57,24 @@ class Enemy(Killable):
     def __init__(self):
         # Enemy specific stuff here
         self.BulletLayer = 1
+        self.x = 640
+        self.y = 0
+        self.velx = 0
+        self.vely = 1       # wish there was a vector class
+        self.bullets = pygame.sprite.Group()
+    def update(self, screen, event_queue, dt):
+        global spritesheet
+
+        self.x = 600+math.sin(self.y/45) * 80
+
+        self.y += self.vely
+
+        rect = pygame.Rect((380, 0, 94, 100))
+        screen.blit(spritesheet, (self.x, self.y), rect)
+
+        self.bullets.update()
+        self.bullets.draw(screen)
+
 
 class Player(Killable):
     def __init__(self):
@@ -70,7 +89,7 @@ class Player(Killable):
     def update(self, screen, event_queue, dt):
         global spritesheet
 
-        rect = pygame.Rect((0, 0, 94, 94))
+        rect = pygame.Rect((0, 0, 94, 100))
         screen.blit(spritesheet, (self.x, self.y), rect)
 
         self.bullets.update()
@@ -201,9 +220,11 @@ class GameState(object):
 class Play(GameState):
     def __init__(self):
         self.player = Player()
+        self.enemy = Enemy()
 
     def update(self, screen, event_queue, dt):
         self.player.update(screen, event_queue, dt)
+        self.enemy.update(screen, event_queue, dt)
         return self
 
 # Draws the menu on screen.

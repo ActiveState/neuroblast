@@ -40,21 +40,22 @@ class Bullet(pygame.sprite.Sprite):
 class Killable(pygame.sprite.Sprite):
     def __init__(self):
         super(Killable, self).__init__()
-
         self.health = 100
     def TakeDamage(self, damage):
         #Take damage fuc tion
         self.health -= damage
-        if self.health < 0:
+        if self.health <= 0:
             # DEAD
             self.Die()
     def Die(self):
         # DO something
         # Trigger Particle or something
+        print "DEAD"
         self.kill()
 
 class Enemy(Killable):
     def __init__(self):
+        super(Enemy, self).__init__()
         # Enemy specific stuff here
         self.BulletLayer = 1
         self.x = 640
@@ -62,7 +63,11 @@ class Enemy(Killable):
         self.velx = 0
         self.vely = 1       # wish there was a vector class
         self.bullets = pygame.sprite.Group()
+        self.rect = pygame.Rect((0, 0, 94, 100))
     def update(self, screen, event_queue, dt):
+        if not self.alive():
+            return
+
         global spritesheet
 
         self.x = 600+math.sin(self.y/45) * 80
@@ -72,12 +77,15 @@ class Enemy(Killable):
         rect = pygame.Rect((380, 0, 94, 100))
         screen.blit(spritesheet, (self.x, self.y), rect)
 
+        self.rect.center = (self.x, self.y)
+
         self.bullets.update()
         self.bullets.draw(screen)
 
 
 class Player(Killable):
     def __init__(self):
+        super(Player, self).__init__()
         # Plauer specifc init stuff here
         self.BulletLayer = 2
         self.x = 500
@@ -85,6 +93,7 @@ class Player(Killable):
         self.velx = 0
         self.vely = 0       # wish there was a vector class
         self.bullets = pygame.sprite.Group()
+        self.rect = pygame.Rect((0, 0, 94, 100))
 
     def update(self, screen, event_queue, dt):
         global spritesheet
@@ -94,6 +103,7 @@ class Player(Killable):
 
         self.bullets.update()
         self.bullets.draw(screen)
+        self.rect.center = (self.x, self.y)
 
         keys=pygame.key.get_pressed()
 
@@ -221,10 +231,24 @@ class Play(GameState):
     def __init__(self):
         self.player = Player()
         self.enemy = Enemy()
+        self.userGroup = pygame.sprite.Group()
+        self.enemies = pygame.sprite.Group()
+        self.userGroup.add(self.player)
+        self.enemies.add(self.enemy)
 
     def update(self, screen, event_queue, dt):
         self.player.update(screen, event_queue, dt)
         self.enemy.update(screen, event_queue, dt)
+
+        player_hit = pygame.sprite.spritecollideany(self.player,self.enemy.bullets)
+        if player_hit:
+            return None
+        
+        enemy_hit = pygame.sprite.spritecollideany(self.enemy,self.player.bullets)
+        if enemy_hit:
+            self.enemy.TakeDamage(20)
+            enemy_hit.kill()
+
         return self
 
 # Draws the menu on screen.

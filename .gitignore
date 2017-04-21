@@ -6,3 +6,4 @@ ansigo
 lock.json
 manifest.json
 vendor/
+*.pyc

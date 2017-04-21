@@ -10,6 +10,7 @@ import pygame
 import pygame.freetype
 import math
 import gamestates
+from utils import *
 
 ### GLOBAL GAME INIT AND MAIN LOOP
 # Basic library initialization

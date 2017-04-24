@@ -11,6 +11,7 @@ import pygame.freetype
 import math
 import gamestates
 from utils import *
+import plot
 
 ### GLOBAL GAME INIT AND MAIN LOOP
 # Basic library initialization
@@ -70,6 +71,11 @@ while not done:
     ## Trap exits from gamestate
     if state == None:
         done = True
+        
+    # Get the plotted data and display it on screen
+    surf = plot.plot((0,1,2,3,4,1,2,2,3,4,1,1,1))
+    
+    screen.blit(surf,(640,0))
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
     # --- Limit to 60 frames per second

@@ -68,17 +68,16 @@ class Enemy(Killable):
         global spritesheet
 
         self.x = 600+math.sin(self.y/45) * 80
-        print self.x
 
         self.y += self.vely
 
         rect = pygame.Rect((380, 0, 94, 100))
-        screen.blit(spritesheet, (self.x, self.y), rect)
+        screen.blit(spritesheet, (self.x-47, self.y-50), rect)
 
         self.rect.center = (self.x, self.y)
 
         if math.fabs(self.x-x) < 5:
-            bul = Bullet(self.x,self.y,RED,(0,1),10,self.bullets)
+            bul = Bullet(self.x,self.y+50,RED,(0,1),10,self.bullets)
 
         self.bullets.update()
         self.bullets.draw(screen)
@@ -100,7 +99,7 @@ class Player(Killable):
         global spritesheet
 
         rect = pygame.Rect((0, 0, 94, 100))
-        screen.blit(spritesheet, (self.x, self.y), rect)
+        screen.blit(spritesheet, (self.x-47, self.y-50), rect)
 
         self.bullets.update()
         self.bullets.draw(screen)
@@ -117,7 +116,7 @@ class Player(Killable):
         if keys[pygame.K_DOWN]:
             self.vely = SHIP_ACC
         if keys[pygame.K_SPACE]:
-            bul = Bullet(self.x,self.y,BLUE,(0,-1),20,self.bullets)
+            bul = Bullet(self.x,self.y-50,BLUE,(0,-1),20,self.bullets)
 
         '''        # Cap speed
         if self.velx > SHIP_MAX:

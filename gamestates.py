@@ -40,15 +40,15 @@ class Menu(GameState):
         self.menu_selection = 1
     def update(self, screen, event_queue, dt):
         nextState = self
-        displaytext('Play', 32, screen.get_width() / 2 - 20, screen.get_height() * 3 / 4
+        displaytext('Play', 32, screen.get_width() / 4 - 20, screen.get_height() * 3 / 4
                     - 40, WHITE, screen)
-        displaytext('Exit', 32, screen.get_width() / 2 - 20, screen.get_height() * 3 / 4,
+        displaytext('Exit', 32, screen.get_width() / 4 - 20, screen.get_height() * 3 / 4,
                     WHITE, screen)
         displaytext('Bit Blaster v1.0', 12, screen.get_width() - 80, screen.get_height() - 20,
                     WHITE, screen)
         displaytext('Copyright (C) 2017 ActiveState Software Inc.', 12, screen.get_width() - 80, screen.get_height() - 10,
                     WHITE, screen)
-        displaytext(u'\u00bb', 32, screen.get_width() / 2 - 60, screen.get_height() * 3 / 4
+        displaytext(u'\u00bb', 32, screen.get_width() / 4 - 60, screen.get_height() * 3 / 4
                     - 40*self.menu_selection, WHITE, screen)
 
         # Each game state processes its own input queue in its own way to avoid messy input logic

@@ -28,7 +28,7 @@ def init_stars(screen):
     stars = []
     for i in range(MAX_STARS):
     # A star is represented as a list with this format: [X,Y,speed]
-        star = [randrange(0,screen.get_width() - 1),
+        star = [randrange(0,screen.get_width()/2 - 4),
                 randrange(0,screen.get_height() - 1),
                 choice([2,3,4])]
         stars.append(star)
@@ -42,7 +42,7 @@ def move_and_draw_stars(screen):
     # it in the top of the screen with a random X coordinate.
     if star[1] >= screen.get_height():
       star[1] = 0
-      star[0] = randrange(0,1279)
+      star[0] = randrange(0,636)
       star[2] = choice([2,3,4])
  
     # Adjust the star color acording to the speed.

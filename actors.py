@@ -55,7 +55,7 @@ class Enemy(Killable):
         super(Enemy, self).__init__()
         # Enemy specific stuff here
         self.BulletLayer = 1
-        self.x = 640
+        self.x = 320
         self.y = 0
         self.velx = 0
         self.vely = 1       # wish there was a vector class
@@ -67,7 +67,7 @@ class Enemy(Killable):
 
         global spritesheet
 
-        self.x = 600+math.sin(self.y/45) * 80
+        self.x = 300+math.sin(self.y/45) * 80
 
         self.y += self.vely
 
@@ -88,7 +88,7 @@ class Player(Killable):
         super(Player, self).__init__()
         # Plauer specifc init stuff here
         self.BulletLayer = 2
-        self.x = 500
+        self.x = 320
         self.y = 500
         self.velx = 0
         self.vely = 0       # wish there was a vector class

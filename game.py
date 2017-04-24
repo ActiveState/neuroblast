@@ -29,10 +29,10 @@ w, h = bgsize
 # TODO Get dynamic resolution but width is 1280 for now
 
 aspect = w/h
-wscale = 1280.0
+wscale = 640
 hscale = wscale/aspect
 
-bgscaled = pygame.transform.scale(background, (1280, int(hscale)))
+bgscaled = pygame.transform.scale(background, (640, int(hscale)))
 
 # Loop until the user clicks the close button.
 done = False

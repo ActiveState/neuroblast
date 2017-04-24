@@ -1,3 +1,4 @@
+from __future__ import division
 import pygame
 import math
 from utils import *
@@ -67,6 +68,7 @@ class Enemy(Killable):
         global spritesheet
 
         self.x = 600+math.sin(self.y/45) * 80
+        print self.x
 
         self.y += self.vely
 

@@ -1,4 +1,5 @@
 import pygame
+import pygame.freetype
 from random import randrange, choice
 
 # Define some colors
@@ -9,14 +10,19 @@ BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 
 # Acceleration in pixels per second
-SHIP_ACC = 25
+SHIP_ACC = 400
 
 ## Constants
 MAX_STARS = 250
 
+def loadfont(size):
+    global font
+    font = pygame.freetype.Font('./De Valencia (beta).otf', size)
+
+
 # Utility functions
 def displaytext(text, fontsize, x, y, color, surface):
-    font = pygame.freetype.Font('./De Valencia (beta).otf', fontsize)
+    global font
     texcol = pygame.Color(*color)
     text = font.render(text, texcol)
     textpos = text[0].get_rect(centerx=x, centery=y)

@@ -4,30 +4,42 @@ from actors import *
 
 # GameState object will return a new state object if it transitions
 class GameState(object):
-    def update(self, screen, event_queue, dt):
+    def update(self, screen, event_queue, dt, clock):
         return self
 
 class Play(GameState):
     def __init__(self):
-        self.player = Player()
-        self.enemy = Enemy()
+        self.enemyBullets = pygame.sprite.Group()
+        self.userBullets = pygame.sprite.Group()
         self.userGroup = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
+        self.player = Player(self.userBullets)
+        self.enemy = Enemy(self.enemyBullets)
         self.userGroup.add(self.player)
         self.enemies.add(self.enemy)
 
-    def update(self, screen, event_queue, dt):
+    def update(self, screen, event_queue, dt, clock):
         self.player.update(screen, event_queue, dt)
         self.enemy.update(screen, event_queue, dt, (self.player.x,self.player.y))
 
-        player_hit = pygame.sprite.spritecollideany(self.player,self.enemy.bullets)
+        player_hit = pygame.sprite.spritecollideany(self.player,self.enemyBullets)
         if player_hit:
             return Menu()
         
-        enemy_hit = pygame.sprite.spritecollideany(self.enemy,self.player.bullets)
+        enemy_hit = pygame.sprite.spritecollideany(self.enemy,self.userBullets)
         if enemy_hit:
             self.enemy.TakeDamage(20)
             enemy_hit.kill()
+            
+        self.userGroup.draw(screen)
+        self.enemies.draw(screen)
+        self.enemyBullets.update(dt)
+        self.enemyBullets.draw(screen)
+        self.userBullets.update(dt)
+        self.userBullets.draw(screen)
+        
+        displaytext("{:.2f}".format(clock.get_fps()) , 16, 60, 20, WHITE, screen)
+         
 
         return self
 
@@ -38,7 +50,7 @@ class Play(GameState):
 class Menu(GameState):
     def __init__(self):
         self.menu_selection = 1
-    def update(self, screen, event_queue, dt):
+    def update(self, screen, event_queue, dt,clock):
         nextState = self
         displaytext('Play', 32, screen.get_width() / 4 - 20, screen.get_height() * 3 / 4
                     - 40, WHITE, screen)

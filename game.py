@@ -9,6 +9,7 @@ from __future__ import division
 import pygame
 import pygame.freetype
 import math
+import numpy as np
 import gamestates
 from utils import *
 import plot
@@ -16,10 +17,13 @@ import plot
 ### GLOBAL GAME INIT AND MAIN LOOP
 # Basic library initialization
 pygame.init()
+loadfont(24)
 
 # Configure screen TODO: Should there be a config object or something to contain this?
 resolution = (1280, 720)
-screen = pygame.display.set_mode(resolution)
+flags = pygame.FULLSCREEN | pygame.DOUBLEBUF
+screen = pygame.display.set_mode(resolution,flags)
+screen.set_alpha(None)
 
 pygame.display.set_caption("Bit Blaster")
 
@@ -48,6 +52,8 @@ state = gamestates.Menu()
 scrollSpeed = 1
 y = -hscale+720
 
+plotUpdateRate = 1/10.0
+plotCounter = 0.0
 
 # -------- Main Program Loop -----------
 while not done:
@@ -67,15 +73,17 @@ while not done:
     # --- Drawing code should go here
     move_and_draw_stars(screen)
     ## Gamestate update
-    state = state.update(screen, event_queue, clock.get_time()/1000.0)
+    state = state.update(screen, event_queue, clock.get_time()/1000.0, clock)
     ## Trap exits from gamestate
     if state == None:
         done = True
         
-    # Get the plotted data and display it on screen
-    surf = plot.plot((0,1,2,3,4,1,2,2,3,4,1,1,1))
-    
-    screen.blit(surf,(640,0))
+    plotCounter+= clock.get_time()/1000.0
+    if plotCounter>plotUpdateRate:
+        # Get the plotted data and display it on screen
+        surf = plot.plot(np.random.random((640, 360)))
+        screen.blit(surf,(640,0))
+        plotCounter = 0.0
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
     # --- Limit to 60 frames per second

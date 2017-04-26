@@ -41,6 +41,8 @@ class Killable(pygame.sprite.Sprite):
         self.health = 100
         self.blinking = False
         self.blinktime = 0.5
+        self.blinkcycles = 6
+        self.blinks = 0
         self.blinkcount = 0
         self.blinkon = False
     def TakeDamage(self, damage):
@@ -55,8 +57,8 @@ class Killable(pygame.sprite.Sprite):
                 # DO something
                 # Trigger Particle or something
                 self.blinking = True
+                self.blinks = 0
     def Die(self):
-        #print "DEAD"
         self.kill()
 
 class Enemy(Killable):
@@ -64,18 +66,22 @@ class Enemy(Killable):
         super(Enemy, self).__init__()
         # Enemy specific stuff here
         self.x = 320
-        self.y = 0
+        self.y = -50
         self.velx = 0
         self.vely = 16       # wish there was a vector class
         self.bullets = bulletgroup
         self.image = pygame.Surface((94,100))
         self.rect = self.image.get_rect()
+        self.cooldown = 0.1
+        self.canfire = True
+        self.bulcount = 0
         ## Generate the sprite image from spritesheet
         ssrect = pygame.Rect((380,0,94,100))
         global spritesheet
         self.image.blit(spritesheet,(0,0),ssrect)
         self.image.convert()
         self.image.set_colorkey(self.image.get_at((0, 0)))
+        self.rect.center = (self.x, self.y)
         
     def update(self, screen, event_queue, dt, (x,y)):
         if not self.alive():
@@ -86,10 +92,17 @@ class Enemy(Killable):
         self.y += self.vely * dt
 
         self.rect.center = (self.x, self.y)
+        
+        if not(self.canfire):
+            self.bulcount += dt
+            if self.bulcount>self.cooldown:
+                self.canfire = True
+                self.bulcount = 0
 
         # x is param that is the player's x position
-        if math.fabs(self.x-x) < 5:
+        if math.fabs(self.x-x) < 5 and self.canfire:
             bul = Bullet(self.x,self.y+50,RED,(0,1),160,self.bullets)
+            self.canfire = False
 
 
 class Player(Killable):
@@ -112,6 +125,18 @@ class Player(Killable):
         self.image.set_colorkey(self.image.get_at((0, 0)))
  
     def update(self, screen, event_queue, dt):
+
+        if self.blinking:
+            self.blinkcount += dt
+
+            if self.blinkcount >= self.blinktime:
+                #print "TOGGLE BLINK"
+                self.blinkon =  not self.blinkon
+                self.blinkcount = 0
+                self.blinks +=1
+                if (self.blinks == self.blinkcycles):
+                    self.blinking = False
+                    self.health = 100      
 
         self.rect.center = (self.x, self.y)
 
@@ -164,6 +189,12 @@ class Player(Killable):
             self.vely = 0
         if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
             self.velx = 0
-
+            
+        if self.x+(self.velx*dt)>640-47 or self.x+(self.velx*dt)<47:
+            self.velx = 0
+        if self.y+(self.vely*dt)>720-50 or self.y+(self.vely*dt)<50:
+            self.vely = 0
+            
+            
         self.x += self.velx * dt
         self.y += self.vely * dt

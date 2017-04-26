@@ -17,29 +17,47 @@ class Play(GameState):
         self.enemy = Enemy(self.enemyBullets)
         self.userGroup.add(self.player)
         self.enemies.add(self.enemy)
+        self.player.lives = 3
+        self.score = 0
+        self.spawntimer = 0
+        self.spawnbreak = 8
 
     def update(self, screen, event_queue, dt, clock):
         self.player.update(screen, event_queue, dt)
-        self.enemy.update(screen, event_queue, dt, (self.player.x,self.player.y))
+        self.enemies.update(screen, event_queue, dt, (self.player.x,self.player.y))
 
-        player_hit = pygame.sprite.spritecollideany(self.player,self.enemyBullets)
-        if player_hit:
-            return Menu()
+        # Spawn new enemies
+        self.spawntimer += dt
+        if self.spawntimer > self.spawnbreak:
+            self.enemies.add(Enemy(self.enemyBullets))
+            self.spawntimer = 0
+
+        if not(self.player.blinking):
+            player_hit = pygame.sprite.spritecollideany(self.player,self.enemyBullets)
+            if player_hit:
+                self.player.TakeDamage(20)
+                player_hit.kill()
         
-        enemy_hit = pygame.sprite.spritecollideany(self.enemy,self.userBullets)
-        if enemy_hit:
-            self.enemy.TakeDamage(20)
-            enemy_hit.kill()
+        enemies_hit = pygame.sprite.groupcollide(self.enemies,self.userBullets,False,True)
+        for enemy, bullet in enemies_hit.iteritems():
+            enemy.TakeDamage(20)
+            self.score += 50
             
-        self.userGroup.draw(screen)
+        if not(self.player.blinking and self.player.blinkon):
+            self.userGroup.draw(screen)
         self.enemies.draw(screen)
         self.enemyBullets.update(dt)
         self.enemyBullets.draw(screen)
         self.userBullets.update(dt)
         self.userBullets.draw(screen)
         
-        displaytext("{:.2f}".format(clock.get_fps()) , 16, 60, 20, WHITE, screen)
-         
+        displaytext("FPS:{:.2f}".format(clock.get_fps()) , 16, 60, 20, WHITE, screen)
+        displaytext("Score: "+str(self.score), 16, 200, 20, WHITE, screen)
+        displaytext("Health: "+str(self.player.health), 16, 350, 20, WHITE, screen)
+        displaytext("Lives: "+str(self.player.lives) , 16, 500, 20, WHITE, screen)
+        
+        if not(self.player.alive()):
+            return Menu() 
 
         return self
 

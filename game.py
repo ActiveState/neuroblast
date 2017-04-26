@@ -49,8 +49,11 @@ init_stars(screen)
 # Initial game state is menu
 state = gamestates.Menu()
 
-scrollSpeed = 1
-y = -hscale+720
+scrollSpeed = -1
+#y = -hscale+720
+
+# Optimized method for scrolling background continuously
+topY = hscale-720       # As soon as topY because -720, next frame, flip it back to hscale-720
 
 plotUpdateRate = 1/10.0
 plotCounter = 0.0
@@ -67,9 +70,22 @@ while not done:
                 done = True
 
     # --- Game logic should go here
-    y += scrollSpeed
+    topY += scrollSpeed
     # --- Screen-clearing code goes here
-    screen.blit(bgscaled, (0, y))
+    #screen.blit(bgscaled, (0, y))
+    offset = hscale+topY    # If topY becomes negative, we use this to seamlessly blit until it clears itself up
+    y = topY
+    blitStartY = 0
+    height = 720
+    if (topY<0):
+        blitStartY = -topY
+        height = 720+topY
+        y = 0
+        screen.blit(bgscaled,(0,0),(0,offset,640,720-height))
+    screen.blit(bgscaled,(0,blitStartY),(0,y,640,height+1))
+    
+    if topY<=-720:
+        topY = hscale-720     
     # --- Drawing code should go here
     move_and_draw_stars(screen)
     ## Gamestate update

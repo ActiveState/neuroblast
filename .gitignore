@@ -7,3 +7,4 @@ lock.json
 manifest.json
 vendor/
 *.pyc
+data/

@@ -2,6 +2,7 @@ from __future__ import division
 import pygame
 import math
 from utils import *
+from random import randrange
 
 # Global Init stuff should have a proper home once not placeholder art
 spritesheet = pygame.image.load("spaceship_sprite_package_by_kryptid.png")
@@ -118,6 +119,7 @@ class Enemy(Killable):
         super(Enemy, self).__init__()
         # Enemy specific stuff here
         self.x = 320
+        self.xbase = randrange(200,400)
         self.y = -50
         self.velx = 0
         self.vely = 16       # wish there was a vector class
@@ -134,12 +136,15 @@ class Enemy(Killable):
         self.image.convert()
         self.image.set_colorkey(self.image.get_at((0, 0)))
         self.rect.center = (self.x, self.y)
+        self.spawntime = pygame.time.get_ticks()
         
-    def update(self, screen, event_queue, dt, (x,y)):
+    def update(self, screen, event_queue, dt, (player_x,player_y),(player_velx,player_vely)):
         if not self.alive():
             return
             
-        self.x = 300+(math.sin(self.y/45) * 80)
+        self.velx = math.sin((pygame.time.get_ticks()-self.spawntime)/1800) * 40
+            
+        self.x = self.xbase + self.velx # velx is already time based so doesn't need deltatime
 
         self.y += self.vely * dt
 
@@ -152,7 +157,7 @@ class Enemy(Killable):
                 self.bulcount = 0
 
         # x is param that is the player's x position
-        if math.fabs(self.x-x) < 5 and self.canfire:
+        if math.fabs(self.x-player_x) < 5 and self.canfire:
             bul = Bullet(self.x,self.y+50,RED,(0,1),160,self.bullets)
             self.canfire = False
 

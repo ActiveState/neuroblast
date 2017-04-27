@@ -1,6 +1,7 @@
 import pygame
 from utils import *
 from actors import *
+#import leaderboard
 
 # GameState object will return a new state object if it transitions
 class GameState(object):
@@ -17,14 +18,14 @@ class Play(GameState):
         self.enemy = Enemy(self.enemyBullets)
         self.userGroup.add(self.player)
         self.enemies.add(self.enemy)
-        self.player.lives = 333
+        self.player.lives = 3
         self.score = 0
         self.spawntimer = 0
         self.spawnbreak = 8
 
     def update(self, screen, event_queue, dt, clock):
         self.player.update(screen, event_queue, dt)
-        self.enemies.update(screen, event_queue, dt, (self.player.x,self.player.y))
+        self.enemies.update(screen, event_queue, dt, (self.player.x,self.player.y), (self.player.velx,self.player.vely))
 
         # Spawn new enemies
         self.spawntimer += dt
@@ -67,6 +68,14 @@ class Play(GameState):
         if not(self.player.alive()):
             return Menu() 
 
+        return self
+
+class GameOver(GameState):
+    def __init__(self):
+        self.highscores = leaderboard.GetScores()
+        
+    def update(self,screen,event_queue,dt,clock):
+        leaderboard.DisplayLeaderBoard(screen,self.highscores)
         return self
 
 # Draws the menu on screen.

@@ -17,7 +17,7 @@ class Play(GameState):
         self.enemy = Enemy(self.enemyBullets)
         self.userGroup.add(self.player)
         self.enemies.add(self.enemy)
-        self.player.lives = 3
+        self.player.lives = 333
         self.score = 0
         self.spawntimer = 0
         self.spawnbreak = 8
@@ -36,6 +36,7 @@ class Play(GameState):
             player_hit = pygame.sprite.spritecollideany(self.player,self.enemyBullets)
             if player_hit:
                 self.player.TakeDamage(20)
+                self.player.playanim("hit",(player_hit.rect.x,player_hit.rect.y))
                 player_hit.kill()
         
         enemies_hit = pygame.sprite.groupcollide(self.enemies,self.userBullets,False,True)
@@ -50,6 +51,13 @@ class Play(GameState):
         self.enemyBullets.draw(screen)
         self.userBullets.update(dt)
         self.userBullets.draw(screen)
+        
+        # Effects go here TODO make them a sprite layer
+        if self.player.anim:
+            if self.player.anim.playing:
+                self.player.anim.update(screen,(self.player.x+self.player.animoffset[0],self.player.y+self.player.animoffset[1]),dt)
+            else:
+                self.player.anim = None        
         
         displaytext("FPS:{:.2f}".format(clock.get_fps()) , 16, 60, 20, WHITE, screen)
         displaytext("Score: "+str(self.score), 16, 200, 20, WHITE, screen)

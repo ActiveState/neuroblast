@@ -7,6 +7,55 @@ from utils import *
 spritesheet = pygame.image.load("spaceship_sprite_package_by_kryptid.png")
 spritesheet.set_colorkey(spritesheet.get_at((0, 0)))
 
+class SpriteSequence(object):
+    def __init__(self,sheet,rect,cols, rows, padding,interval, loop):
+        self.sheet = sheet
+        self.rect = rect
+        self.cols = cols
+        self.rows = rows
+        self.padding = padding
+        self.interval = interval
+        self.loop = loop
+        self.currentcol = 0
+        self.currentrow = 0
+        self.playing = False
+        self.counter = 0
+    def play(self):
+        self.counter = 0
+        self.currentcol = 0
+        self.currentrow = 0
+        self.playing = True
+
+    def stop(self):
+        self.counter = 0
+        self.currentcol = 0
+        self.currentrow = 0
+        self.playing = False
+        
+    def update(self, surface, pos, dt):
+        if self.playing:
+            self.counter += dt
+            if self.counter>=self.interval:
+                self.counter = 0
+                self.currentcol += 1
+                if self.currentcol >= self.cols:
+                    self.currentcol = 0
+                    self.currentrow += 1
+                    if self.currentrow >= self.rows:
+                        if self.loop:
+                            self.currentcol=0
+                            self.currentrow=0
+                        else:
+                            self.playing=False
+            
+            if self.playing:
+                surface.blit(self.sheet,pos,(self.rect.x+self.currentcol*self.rect.w+self.currentcol*self.padding,
+                                        self.rect.y+self.currentrow*self.rect.h+self.currentrow*self.padding,
+                                        self.rect.w,self.rect.h))
+                                        
+        
+        
+
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, color, direction, speed, container):
@@ -45,11 +94,14 @@ class Killable(pygame.sprite.Sprite):
         self.blinks = 0
         self.blinkcount = 0
         self.blinkon = False
+        self.deadcb = None
     def TakeDamage(self, damage):
         #Take damage fuc tion
         self.health -= damage
         if self.health <= 0:
             self.lives -= 1
+            if self.deadcb:
+                self.deadcb()
             if (self.lives<0):
                 # DEAD
                 self.Die()
@@ -108,12 +160,12 @@ class Enemy(Killable):
 class Player(Killable):
     def __init__(self,bulletgroup):
         super(Player, self).__init__()
-        # Plauer specifc init stuff here
-        self.lives = 3
+        # Player specifc init stuff here
         self.x = 320
         self.y = 500
         self.velx = 0
         self.vely = 0       # wish there was a vector class
+        self.deadcb = self.amdead
         self.bullets = bulletgroup
         self.image = pygame.Surface((94,100))
         self.rect = self.image.get_rect()
@@ -123,8 +175,30 @@ class Player(Killable):
         self.image.blit(spritesheet,(0,0),ssrect)
         self.image.convert()
         self.image.set_colorkey(self.image.get_at((0, 0)))
+        self.hitAnim = SpriteSequence(spritesheet,pygame.Rect(96,765,31,31),4,2,1,0.1,False)
+        self.blowAnim = SpriteSequence(spritesheet,pygame.Rect(0,202,94,100),4,2,1,0.5,False)
+        self.anim = None
+        self.animoffset = (0,0)
+    
+    def amdead(self):
+        print str(self.x)
+        self.playanim("blow",(self.x-300,self.y-300))
+    
+    def playanim(self,name,offset):
+        if self.anim != self.blowAnim and name=="hit":
+            self.anim = self.hitAnim
+        if name=="blow":
+            self.anim = self.blowAnim
+            
+        
+        if self.anim:    
+            self.animoffset = (offset[0]-self.x,offset[1]-self.y)
+            self.anim.play()
+
  
     def update(self, screen, event_queue, dt):
+        
+        self.rect.center = (self.x, self.y)
 
         if self.blinking:
             self.blinkcount += dt
@@ -137,8 +211,6 @@ class Player(Killable):
                 if (self.blinks == self.blinkcycles):
                     self.blinking = False
                     self.health = 100      
-
-        self.rect.center = (self.x, self.y)
 
         keys=pygame.key.get_pressed()
 

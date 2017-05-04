@@ -53,13 +53,9 @@ class SpriteSequence(object):
                 surface.blit(self.sheet,pos,(self.rect.x+self.currentcol*self.rect.w+self.currentcol*self.padding,
                                         self.rect.y+self.currentrow*self.rect.h+self.currentrow*self.padding,
                                         self.rect.w,self.rect.h))
-                                        
-        
-        
-
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y, color, direction, speed, container):
+    def __init__(self, x, y, color, direction, speed, container, brain = None):
         pygame.sprite.Sprite.__init__(self, container)
         self.image = pygame.Surface((10, 10), pygame.SRCALPHA, 32)
         self.image = self.image.convert_alpha()
@@ -74,6 +70,7 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.direction = direction
         self.speed = speed
+        self.brain = brain
 
     def update(self, dt):
         (x, y) = self.rect.center
@@ -82,6 +79,8 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         # TODO make the bounds constants or dynamic
         if y <= 0 or y >= 720 or x <= 0 or x >= 1280:
+            if self.brain:
+                self.brain.record_miss(self)
             self.kill()
 
 class Killable(pygame.sprite.Sprite):
@@ -96,6 +95,7 @@ class Killable(pygame.sprite.Sprite):
         self.blinkcount = 0
         self.blinkon = False
         self.deadcb = None
+
     def TakeDamage(self, damage):
         #Take damage fuc tion
         self.health -= damage
@@ -115,11 +115,10 @@ class Killable(pygame.sprite.Sprite):
         self.kill()
 
 class Enemy(Killable):
-    def __init__(self, bulletgroup):
+    def __init__(self, bulletgroup, brain):
         super(Enemy, self).__init__()
         # Enemy specific stuff here
-        self.x = 320
-        self.xbase = randrange(200,400)
+        self.x = randrange(0,450)
         self.y = -50
         self.velx = 0
         self.vely = 16       # wish there was a vector class
@@ -129,6 +128,7 @@ class Enemy(Killable):
         self.cooldown = 0.1
         self.canfire = True
         self.bulcount = 0
+        self.brain = brain
         ## Generate the sprite image from spritesheet
         ssrect = pygame.Rect((380,0,94,100))
         global spritesheet
@@ -142,10 +142,8 @@ class Enemy(Killable):
         if not self.alive():
             return
             
-        self.velx = math.sin((pygame.time.get_ticks()-self.spawntime)/1800) * 40
-            
-        self.x = self.xbase + self.velx # velx is already time based so doesn't need deltatime
-
+        self.velx = math.sin((pygame.time.get_ticks()-self.spawntime)/1800) * 40 
+        self.x += self.velx * dt
         self.y += self.vely * dt
 
         self.rect.center = (self.x, self.y)
@@ -158,9 +156,13 @@ class Enemy(Killable):
 
         # x is param that is the player's x position
         if math.fabs(self.x-player_x) < 5 and self.canfire:
-            bul = Bullet(self.x,self.y+50,RED,(0,1),160,self.bullets)
+            bul = Bullet(self.x,self.y+50,RED,(0,1),160,self.bullets,self.brain)
+            dx = self.x - player_x
+            dy = self.y - player_y
+            du = self.velx - player_velx
+            dv = self.vely - player_vely
+            self.brain.add_shot(bul, dx, dy, du, dv)
             self.canfire = False
-
 
 class Player(Killable):
     def __init__(self,bulletgroup):
@@ -230,38 +232,11 @@ class Player(Killable):
         if keys[pygame.K_SPACE]:
             bul = Bullet(self.x,self.y-50,BLUE,(0,-1),320,self.bullets)
 
-        '''        # Cap speed
-        if self.velx > SHIP_MAX:
-            self.velx = SHIP_MAX
-        elif self.velx<-SHIP_MAX:
-            self.velx = -SHIP_MAX
-        if self.vely > SHIP_MAX:
-            self.vely = SHIP_MAX
-        elif self.vely<-SHIP_MAX:
-            self.vely = -SHIP_MAX
+        self.velx = min(self.velx, self.health*2)
+        self.velx = max(self.velx, -self.health*2)
+        self.vely = min(self.vely, self.health)
+        self.vely = max(self.vely, -self.health)
 
-        # Decelerate
-        if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]) and self.velx != 0:
-            sign = 1
-            if (self.velx<0):
-                sign = -1
-            self.velx -= SHIP_ACC * 2 * sign
-            if (sign==1 and self.velx<0):
-                self.velx = 0
-            elif (sign==-1 and self.velx>0):
-                self.velx = 0
-
-        if not (keys[pygame.K_UP] or keys[pygame.K_DOWN]) and self.vely != 0:
-            sign = 1
-            if (self.vely<0):
-                sign = -1
-            self.vely -= SHIP_ACC * 2 * sign
-            if (sign==1 and self.vely<0):
-                self.vely = 0
-            elif (sign==-1 and self.vely>0):
-                self.vely = 0
-            
-        '''
         if not (keys[pygame.K_UP] or keys[pygame.K_DOWN]):
             self.vely = 0
         if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
@@ -271,7 +246,6 @@ class Player(Killable):
             self.velx = 0
         if self.y+(self.vely*dt)>720-50 or self.y+(self.vely*dt)<50:
             self.vely = 0
-            
             
         self.x += self.velx * dt
         self.y += self.vely * dt

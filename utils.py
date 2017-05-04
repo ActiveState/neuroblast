@@ -10,7 +10,7 @@ BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 
 # Acceleration in pixels per second
-SHIP_ACC = 400
+SHIP_ACC = 100
 
 ## Constants
 MAX_STARS = 250

@@ -13,6 +13,7 @@ import numpy as np
 import gamestates
 from utils import *
 import plot
+import sys
 
 ### GLOBAL GAME INIT AND MAIN LOOP
 # Basic library initialization
@@ -22,7 +23,9 @@ loadfont(24)
 # Configure screen TODO: Should there be a config object or something to contain this?
 resolution = (1280, 720)
 flags = pygame.FULLSCREEN | pygame.DOUBLEBUF
-screen = pygame.display.set_mode(resolution,flags)
+if (len(sys.argv) > 1) and (sys.argv[1] == '-f'):
+    flags = pygame.DOUBLEBUF
+screen = pygame.display.set_mode(resolution, flags)
 screen.set_alpha(None)
 
 pygame.display.set_caption("Bit Blaster")

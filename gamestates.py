@@ -1,6 +1,8 @@
 import pygame
 from utils import *
 from actors import *
+from brain import Brain
+
 #import leaderboard
 
 # GameState object will return a new state object if it transitions
@@ -10,12 +12,13 @@ class GameState(object):
 
 class Play(GameState):
     def __init__(self):
+        self.brain = Brain();
         self.enemyBullets = pygame.sprite.Group()
         self.userBullets = pygame.sprite.Group()
         self.userGroup = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.player = Player(self.userBullets)
-        self.enemy = Enemy(self.enemyBullets)
+        self.enemy = Enemy(self.enemyBullets, self.brain)
         self.userGroup.add(self.player)
         self.enemies.add(self.enemy)
         self.player.lives = 3
@@ -30,15 +33,15 @@ class Play(GameState):
         # Spawn new enemies
         self.spawntimer += dt
         if self.spawntimer > self.spawnbreak:
-            self.enemies.add(Enemy(self.enemyBullets))
+            self.enemies.add(Enemy(self.enemyBullets, self.brain))
             self.spawntimer = 0
 
         if not(self.player.blinking):
-            player_hit = pygame.sprite.spritecollideany(self.player,self.enemyBullets)
-            if player_hit:
+            player_hit = pygame.sprite.spritecollide(self.player,self.enemyBullets, True)
+            for bullet in player_hit:
+                self.brain.record_hit(bullet)
                 self.player.TakeDamage(20)
-                self.player.playanim("hit",(player_hit.rect.x,player_hit.rect.y))
-                player_hit.kill()
+                self.player.playanim("hit",(bullet.rect.x,bullet.rect.y))
         
         enemies_hit = pygame.sprite.groupcollide(self.enemies,self.userBullets,False,True)
         for enemy, bullet in enemies_hit.iteritems():

@@ -21,7 +21,8 @@ loadfont(24)
 
 # Configure screen TODO: Should there be a config object or something to contain this?
 resolution = (1280, 720)
-flags = pygame.FULLSCREEN | pygame.DOUBLEBUF
+#flags = pygame.FULLSCREEN | pygame.DOUBLEBUF
+flags = pygame.DOUBLEBUF
 screen = pygame.display.set_mode(resolution,flags)
 screen.set_alpha(None)
 

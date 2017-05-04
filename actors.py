@@ -9,7 +9,8 @@ spritesheet = pygame.image.load("spaceship_sprite_package_by_kryptid.png")
 spritesheet.set_colorkey(spritesheet.get_at((0, 0)))
 
 class SpriteSequence(object):
-    def __init__(self,sheet,rect,cols, rows, padding,interval, loop):
+    def __init__(self,name,sheet,rect,cols, rows, padding,interval, loop, cb):
+        self.name = name
         self.sheet = sheet
         self.rect = rect
         self.cols = cols
@@ -21,6 +22,7 @@ class SpriteSequence(object):
         self.currentrow = 0
         self.playing = False
         self.counter = 0
+        self.cb = cb
     def play(self):
         self.counter = 0
         self.currentcol = 0
@@ -47,9 +49,12 @@ class SpriteSequence(object):
                             self.currentcol=0
                             self.currentrow=0
                         else:
+                            if (self.cb):
+                                self.cb(self.name)
                             self.playing=False
             
             if self.playing:
+                print pos
                 surface.blit(self.sheet,pos,(self.rect.x+self.currentcol*self.rect.w+self.currentcol*self.padding,
                                         self.rect.y+self.currentrow*self.rect.h+self.currentrow*self.padding,
                                         self.rect.w,self.rect.h))
@@ -96,17 +101,22 @@ class Killable(pygame.sprite.Sprite):
         self.blinkcount = 0
         self.blinkon = False
         self.deadcb = None
+        self.anim = None
+        self.animoffset = (0,0)
+        
+        
     def TakeDamage(self, damage):
         #Take damage fuc tion
+        # Already dead!
+        if self.health<=0:
+            return
+        
         self.health -= damage
         if self.health <= 0:
             self.lives -= 1
             if self.deadcb:
                 self.deadcb()
-            if (self.lives<0):
-                # DEAD
-                self.Die()
-            else:
+            if (self.lives>=0):
                 # DO something
                 # Trigger Particle or something
                 self.blinking = True
@@ -137,6 +147,34 @@ class Enemy(Killable):
         self.image.set_colorkey(self.image.get_at((0, 0)))
         self.rect.center = (self.x, self.y)
         self.spawntime = pygame.time.get_ticks()
+        self.deadcb = self.amdead
+        self.hitAnim = SpriteSequence("hit",spritesheet,pygame.Rect(96,765,31,31),4,2,1,0.1,False,None)
+        self.blowAnim = SpriteSequence("blow",spritesheet,pygame.Rect(0,202,94,100),4,2,1,0.1,False,self.onAnimComplete)
+ 
+    def onAnimComplete(self,name):
+        if name == "blow":
+            print "BLOW ANIM COMPLETE, DYING"
+            self.Die()
+ 
+    def amdead(self):
+        print self
+        print "ENEMY POS: "+str(self.x)+","+str(self.y)
+        print "OFFSET" + str(self.animoffset)
+        self.playanim("blow",(self.x-47,self.y-50))
+ 
+      
+    def playanim(self,name,offset):
+        if self.anim != self.blowAnim and name=="hit":
+            print "HIT ANIM"
+            self.anim = self.hitAnim
+            self.animoffset = (offset[0]-self.x,offset[1]-self.y)
+            self.anim.play()
+        if self.anim != self.blowAnim and name=="blow":
+            print "BLOW ANIM"
+            self.anim = self.blowAnim            
+            self.animoffset = (offset[0]-self.x,offset[1]-self.y)
+            self.anim.play()
+          
         
     def update(self, screen, event_queue, dt, (player_x,player_y),(player_velx,player_vely)):
         if not self.alive():
@@ -180,25 +218,32 @@ class Player(Killable):
         self.image.blit(spritesheet,(0,0),ssrect)
         self.image.convert()
         self.image.set_colorkey(self.image.get_at((0, 0)))
-        self.hitAnim = SpriteSequence(spritesheet,pygame.Rect(96,765,31,31),4,2,1,0.1,False)
-        self.blowAnim = SpriteSequence(spritesheet,pygame.Rect(0,202,94,100),4,2,1,0.5,False)
-        self.anim = None
-        self.animoffset = (0,0)
+        self.hitAnim = SpriteSequence("hit",spritesheet,pygame.Rect(96,765,31,31),4,2,1,0.1,False,None)
+        self.blowAnim = SpriteSequence("blow",spritesheet,pygame.Rect(0,202,94,100),4,2,1,0.1,False,self.onAnimComplete)
+ 
+    def onAnimComplete(self,name):
+        if name == "blow":
+            print "BLOW ANIM COMPLETE, DYING"
+            if self.lives<0:
+                self.Die()
+ 
     
     def amdead(self):
-        print str(self.x)
-        self.playanim("blow",(self.x-300,self.y-300))
+        print str(self.x)+","+str(self.y)
+        self.playanim("blow",(self.x-47,self.y-50))
     
     def playanim(self,name,offset):
         if self.anim != self.blowAnim and name=="hit":
+            print "HIT ANIM"
             self.anim = self.hitAnim
-        if name=="blow":
-            self.anim = self.blowAnim
-            
-        
-        if self.anim:    
             self.animoffset = (offset[0]-self.x,offset[1]-self.y)
             self.anim.play()
+        if self.anim != self.blowAnim and name=="blow":
+            print "BLOW ANIM"
+            self.anim = self.blowAnim            
+            self.animoffset = (offset[0]-self.x,offset[1]-self.y)
+            self.anim.play()
+
 
  
     def update(self, screen, event_queue, dt):

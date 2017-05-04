@@ -1,7 +1,8 @@
 import pygame
 from utils import *
 from actors import *
-#import leaderboard
+import leaderboard
+import gameover
 
 # GameState object will return a new state object if it transitions
 class GameState(object):
@@ -18,7 +19,7 @@ class Play(GameState):
         self.enemy = Enemy(self.enemyBullets)
         self.userGroup.add(self.player)
         self.enemies.add(self.enemy)
-        self.player.lives = 3
+        self.player.lives = 9
         self.score = 0
         self.spawntimer = 0
         self.spawnbreak = 8
@@ -40,10 +41,6 @@ class Play(GameState):
                 self.player.playanim("hit",(player_hit.rect.x,player_hit.rect.y))
                 player_hit.kill()
         
-        enemies_hit = pygame.sprite.groupcollide(self.enemies,self.userBullets,False,True)
-        for enemy, bullet in enemies_hit.iteritems():
-            enemy.TakeDamage(20)
-            self.score += 50
             
         if not(self.player.blinking and self.player.blinkon):
             self.userGroup.draw(screen)
@@ -52,13 +49,32 @@ class Play(GameState):
         self.enemyBullets.draw(screen)
         self.userBullets.update(dt)
         self.userBullets.draw(screen)
+
+        enemies_hit = pygame.sprite.groupcollide(self.enemies,self.userBullets,False,True)
+        for enemy, bullets in enemies_hit.iteritems():
+            enemy.TakeDamage(20)
+            for b in bullets:
+                enemy.playanim("hit",(b.rect.x,b.rect.y))
+            self.score += 50
+
+        ## Update enemy animation frames
+        for enemy in self.enemies:
+            if enemy.anim:
+                if enemy.anim.playing:
+                    print enemy.animoffset
+                    enemy.anim.update(screen,(enemy.x+enemy.animoffset[0],enemy.y+enemy.animoffset[1]),dt)
+                else:
+                    enemy.anim = None
+            
         
         # Effects go here TODO make them a sprite layer
         if self.player.anim:
             if self.player.anim.playing:
                 self.player.anim.update(screen,(self.player.x+self.player.animoffset[0],self.player.y+self.player.animoffset[1]),dt)
             else:
-                self.player.anim = None        
+                self.player.anim = None
+                
+                        
         
         displaytext("FPS:{:.2f}".format(clock.get_fps()) , 16, 60, 20, WHITE, screen)
         displaytext("Score: "+str(self.score), 16, 200, 20, WHITE, screen)
@@ -66,17 +82,44 @@ class Play(GameState):
         displaytext("Lives: "+str(self.player.lives) , 16, 500, 20, WHITE, screen)
         
         if not(self.player.alive()):
-            return Menu() 
+            return GameOver() 
 
         return self
 
 class GameOver(GameState):
     def __init__(self):
+        self.name = ""
+        gameover.pressed = ""
+    def update(self,screen,event_queue,dt,clock):
+        nextState = self
+        if self.name == "":
+            self.name = gameover.enter_text(event_queue,screen, 8)
+        for event in event_queue:
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_RETURN and self.name == "":
+                    self.name = gameover.pressed
+                elif event.key == pygame.K_RETURN and self.name != "":
+                    nextState = Leaderboard()       
+        
+        
+        return nextState
+
+class Leaderboard(GameState):
+    def __init__(self):
         self.highscores = leaderboard.GetScores()
+        #print "init gameover state"
         
     def update(self,screen,event_queue,dt,clock):
-        leaderboard.DisplayLeaderBoard(screen,self.highscores)
-        return self
+        nextState = self
+        #print "in gameover state"
+        print self.highscores
+        leaderboard.DisplayLeaderBoard(screen,self.highscores,"Bob")
+        for event in event_queue:
+            if event.type == pygame.KEYDOWN:
+                nextState = Menu()
+        
+        
+        return nextState
 
 # Draws the menu on screen.
 # This is a class that is just instantiated

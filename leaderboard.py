@@ -9,12 +9,19 @@ client = MongoClient('localhost', 27017)
 db = client.test
 scores = db.scores
 
-def DisplayLeaderBoard(screen, highscores):
+def DisplayLeaderBoard(screen, highscores, name):
     y = 100
+    displaytext("TOP PLAYERS", 16, 320, 50, WHITE, screen)
     for s in highscores:
-        displaytext(s['name'], 16, 100, y, WHITE, screen)
-        displaytext(str(s['score']), 16, 400, y, WHITE, screen)
+        if s['name'] == name:
+            color = (255, 255, 0) # YELLOW
+        else:
+            color = WHITE
+        displaytext(s['name'], 16, 160, y, color, screen)
+        displaytext(str(s['score']), 16, 480, y, color, screen)
         y+=30
+
+    displaytext("PRESS ANY KEY TO CONTINUE", 16, 320, 640, WHITE, screen)
         
     
 
@@ -22,7 +29,7 @@ def StoreScore(name,score):
     scores.insert({"name":name,"score":score,"time":str(datetime.now())})
     
 def GetScores():
-    return scores.find().sort("score",DESCENDING).limit(10)
+    return list(scores.find().sort("score",DESCENDING).limit(10))
 
 def Test():
     # Clear scores first for testing

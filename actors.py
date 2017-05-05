@@ -4,6 +4,8 @@ import math
 from utils import *
 from random import randrange
 
+
+
 # Global Init stuff should have a proper home once not placeholder art
 spritesheet = pygame.image.load("spaceship_sprite_package_by_kryptid.png")
 spritesheet.set_colorkey(spritesheet.get_at((0, 0)))
@@ -247,7 +249,7 @@ class Player(Killable):
 
 
  
-    def update(self, screen, event_queue, dt):
+    def update(self, screen, event_queue, dt, joystick):
         
         self.rect.center = (self.x, self.y)
 
@@ -265,15 +267,19 @@ class Player(Killable):
 
         keys=pygame.key.get_pressed()
 
-        if keys[pygame.K_LEFT]:
+        if keys[pygame.K_LEFT] or joystick.get_axis(0)<-DEADZONE or joystick.get_button(2):
+            print "left"
             self.velx = -SHIP_ACC
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT] or joystick.get_axis(0)>DEADZONE or joystick.get_button(3):
+            print "right"
             self.velx = SHIP_ACC
-        if keys[pygame.K_UP]:
+        if keys[pygame.K_UP] or joystick.get_axis(1)<-DEADZONE or joystick.get_button(0):
+            print "up"
             self.vely = -SHIP_ACC
-        if keys[pygame.K_DOWN]:
+        if keys[pygame.K_DOWN] or joystick.get_axis(1)>DEADZONE or joystick.get_button(1):
+            print "down"
             self.vely = SHIP_ACC
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_SPACE] or joystick.get_button(11):
             bul = Bullet(self.x,self.y-50,BLUE,(0,-1),320,self.bullets)
 
         self.velx = min(self.velx, self.health*2)
@@ -281,9 +287,11 @@ class Player(Killable):
         self.vely = min(self.vely, self.health)
         self.vely = max(self.vely, -self.health)
 
-        if not (keys[pygame.K_UP] or keys[pygame.K_DOWN]):
+        if not (keys[pygame.K_UP] or keys[pygame.K_DOWN] or math.fabs(joystick.get_axis(1))>DEADZONE or joystick.get_button(0) or joystick.get_button(1)):
+            #print "dfsdfsdfs"
             self.vely = 0
-        if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
+        if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT] or math.fabs(joystick.get_axis(0))>DEADZONE or joystick.get_button(2) or joystick.get_button(3)):
+            #print "aaaoieuroiuo"
             self.velx = 0
             
         if self.x+(self.velx*dt)>640-47 or self.x+(self.velx*dt)<47:

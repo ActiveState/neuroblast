@@ -11,6 +11,7 @@ RED = (255, 0, 0)
 
 # Acceleration in pixels per second
 SHIP_ACC = 100
+DEADZONE = 0.25
 
 ## Constants
 MAX_STARS = 250

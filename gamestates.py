@@ -3,12 +3,13 @@ from utils import *
 from actors import *
 from brain import Brain
 
+import math
 import leaderboard
 import gameover
 
 # GameState object will return a new state object if it transitions
 class GameState(object):
-    def update(self, screen, event_queue, dt, clock):
+    def update(self, screen, event_queue, dt, clock, joystick):
         return self
 
 class Play(GameState):
@@ -27,8 +28,8 @@ class Play(GameState):
         self.spawntimer = 0
         self.spawnbreak = 8
 
-    def update(self, screen, event_queue, dt, clock):
-        self.player.update(screen, event_queue, dt)
+    def update(self, screen, event_queue, dt, clock, joystick):
+        self.player.update(screen, event_queue, dt,joystick)
         self.enemies.update(screen, event_queue, dt, (self.player.x,self.player.y), (self.player.velx,self.player.vely))
 
         # Spawn new enemies
@@ -93,7 +94,7 @@ class GameOver(GameState):
     def __init__(self):
         self.name = ""
         gameover.pressed = ""
-    def update(self,screen,event_queue,dt,clock):
+    def update(self,screen,event_queue,dt,clock, joystick):
         nextState = self
         if self.name == "":
             self.name = gameover.enter_text(event_queue,screen, 8)
@@ -131,7 +132,7 @@ class Leaderboard(GameState):
 class Menu(GameState):
     def __init__(self):
         self.menu_selection = 1
-    def update(self, screen, event_queue, dt,clock):
+    def update(self, screen, event_queue, dt,clock,joystick):
         nextState = self
         displaytext('Play', 32, screen.get_width() / 4 - 20, screen.get_height() * 3 / 4
                     - 40, WHITE, screen)
@@ -146,13 +147,13 @@ class Menu(GameState):
 
         # Each game state processes its own input queue in its own way to avoid messy input logic
         for event in event_queue:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_DOWN or event.key == pygame.K_UP:
+            if event.type == pygame.KEYDOWN or event.type == pygame.JOYBUTTONDOWN:
+                if (event.type == pygame.KEYDOWN and (event.key == pygame.K_DOWN or event.key == pygame.K_UP)) or (event.type == pygame.JOYBUTTONDOWN and (event.button == 0 or event.button == 1)) or (event.type == pygame.JOYAXISMOTION and (event.axis == 1 or math.fabs(event.value) >= 0.5)):
                     if self.menu_selection == 0:
                         self.menu_selection = 1
                     else:
                         self.menu_selection = 0
-                if event.key == pygame.K_RETURN:
+                if (event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN) or (event.type == pygame.JOYBUTTONDOWN and event.button == 11):
                     if self.menu_selection == 1:
                         nextState = Play()
                     else:

@@ -25,7 +25,7 @@ resolution = (1280, 720)
 #flags = pygame.FULLSCREEN | pygame.DOUBLEBUF
 flags = pygame.DOUBLEBUF
 if (len(sys.argv) > 1) and (sys.argv[1] == '-f'):
-    flags = pygame.DOUBLEBUF
+    flags |= pygame.FULLSCREEN
 screen = pygame.display.set_mode(resolution, flags)
 screen.set_alpha(None)
 
@@ -48,6 +48,12 @@ done = False
 
 # Used to manage how fast the screen updates
 clock = pygame.time.Clock()
+
+# Init gamepads
+# Initialize the joystick control, get the first one
+pygame.joystick.init()
+joystick = pygame.joystick.Joystick(0)
+joystick.init()
 
 init_stars(screen)
 # Initial game state is menu
@@ -93,7 +99,7 @@ while not done:
     # --- Drawing code should go here
     move_and_draw_stars(screen)
     ## Gamestate update
-    state = state.update(screen, event_queue, clock.get_time()/1000.0, clock)
+    state = state.update(screen, event_queue, clock.get_time()/1000.0, clock, joystick)
     ## Trap exits from gamestate
     if state == None:
         done = True

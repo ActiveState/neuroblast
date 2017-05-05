@@ -65,7 +65,7 @@ class Play(GameState):
         for enemy in self.enemies:
             if enemy.anim:
                 if enemy.anim.playing:
-                    print enemy.animoffset
+                    #print enemy.animoffset
                     enemy.anim.update(screen,(enemy.x+enemy.animoffset[0],enemy.y+enemy.animoffset[1]),dt)
                 else:
                     enemy.anim = None
@@ -116,7 +116,7 @@ class Leaderboard(GameState):
     def update(self,screen,event_queue,dt,clock):
         nextState = self
         #print "in gameover state"
-        print self.highscores
+        #print self.highscores
         leaderboard.DisplayLeaderBoard(screen,self.highscores,"Bob")
         for event in event_queue:
             if event.type == pygame.KEYDOWN:

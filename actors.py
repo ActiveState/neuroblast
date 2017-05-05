@@ -56,7 +56,7 @@ class SpriteSequence(object):
                             self.playing=False
             
             if self.playing:
-                print pos
+                #print pos
                 surface.blit(self.sheet,pos,(self.rect.x+self.currentcol*self.rect.w+self.currentcol*self.padding,
                                         self.rect.y+self.currentrow*self.rect.h+self.currentrow*self.padding,
                                         self.rect.w,self.rect.h))
@@ -154,24 +154,24 @@ class Enemy(Killable):
  
     def onAnimComplete(self,name):
         if name == "blow":
-            print "BLOW ANIM COMPLETE, DYING"
+            #print "BLOW ANIM COMPLETE, DYING"
             self.Die()
  
     def amdead(self):
-        print self
-        print "ENEMY POS: "+str(self.x)+","+str(self.y)
-        print "OFFSET" + str(self.animoffset)
+        #print self
+        #print "ENEMY POS: "+str(self.x)+","+str(self.y)
+        #print "OFFSET" + str(self.animoffset)
         self.playanim("blow",(self.x-47,self.y-50))
  
       
     def playanim(self,name,offset):
         if self.anim != self.blowAnim and name=="hit":
-            print "HIT ANIM"
+            #print "HIT ANIM"
             self.anim = self.hitAnim
             self.animoffset = (offset[0]-self.x,offset[1]-self.y)
             self.anim.play()
         if self.anim != self.blowAnim and name=="blow":
-            print "BLOW ANIM"
+            #print "BLOW ANIM"
             self.anim = self.blowAnim            
             self.animoffset = (offset[0]-self.x,offset[1]-self.y)
             self.anim.play()
@@ -226,23 +226,23 @@ class Player(Killable):
  
     def onAnimComplete(self,name):
         if name == "blow":
-            print "BLOW ANIM COMPLETE, DYING"
+            #print "BLOW ANIM COMPLETE, DYING"
             if self.lives<0:
                 self.Die()
  
     
     def amdead(self):
-        print str(self.x)+","+str(self.y)
+        #print str(self.x)+","+str(self.y)
         self.playanim("blow",(self.x-47,self.y-50))
     
     def playanim(self,name,offset):
         if self.anim != self.blowAnim and name=="hit":
-            print "HIT ANIM"
+            #print "HIT ANIM"
             self.anim = self.hitAnim
             self.animoffset = (offset[0]-self.x,offset[1]-self.y)
             self.anim.play()
         if self.anim != self.blowAnim and name=="blow":
-            print "BLOW ANIM"
+            #print "BLOW ANIM"
             self.anim = self.blowAnim            
             self.animoffset = (offset[0]-self.x,offset[1]-self.y)
             self.anim.play()
@@ -268,16 +268,16 @@ class Player(Killable):
         keys=pygame.key.get_pressed()
 
         if keys[pygame.K_LEFT] or joystick.get_axis(0)<-DEADZONE or joystick.get_button(2):
-            print "left"
+            #print "left"
             self.velx = -SHIP_ACC
         if keys[pygame.K_RIGHT] or joystick.get_axis(0)>DEADZONE or joystick.get_button(3):
-            print "right"
+            #print "right"
             self.velx = SHIP_ACC
         if keys[pygame.K_UP] or joystick.get_axis(1)<-DEADZONE or joystick.get_button(0):
-            print "up"
+            #print "up"
             self.vely = -SHIP_ACC
         if keys[pygame.K_DOWN] or joystick.get_axis(1)>DEADZONE or joystick.get_button(1):
-            print "down"
+            #print "down"
             self.vely = SHIP_ACC
         if keys[pygame.K_SPACE] or joystick.get_button(11):
             bul = Bullet(self.x,self.y-50,BLUE,(0,-1),320,self.bullets)

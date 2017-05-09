@@ -23,7 +23,7 @@ class Play(GameState):
         self.enemy = Enemy(self.enemyBullets, self.brain)
         self.userGroup.add(self.player)
         self.enemies.add(self.enemy)
-        self.player.lives = 9
+        self.player.lives = 0
         self.score = 0
         self.spawntimer = 0
         self.spawnbreak = 8
@@ -86,6 +86,7 @@ class Play(GameState):
         displaytext("Lives: "+str(self.player.lives) , 16, 500, 20, WHITE, screen)
         
         if not(self.player.alive()):
+            self.brain.learn()
             return GameOver() 
 
         return self

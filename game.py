@@ -52,8 +52,11 @@ clock = pygame.time.Clock()
 # Init gamepads
 # Initialize the joystick control, get the first one
 pygame.joystick.init()
-joystick = pygame.joystick.Joystick(0)
-joystick.init()
+if (pygame.joystick.get_count()>0):
+    joystick = pygame.joystick.Joystick(0)
+    joystick.init()
+else:
+    joystick = None
 
 init_stars(screen)
 # Initial game state is menu

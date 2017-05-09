@@ -267,19 +267,19 @@ class Player(Killable):
 
         keys=pygame.key.get_pressed()
 
-        if keys[pygame.K_LEFT] or joystick.get_axis(0)<-DEADZONE or joystick.get_button(2):
+        if keys[pygame.K_LEFT] or (joystick and (joystick.get_axis(0)<-DEADZONE or joystick.get_button(2))):
             #print "left"
             self.velx = -SHIP_ACC
-        if keys[pygame.K_RIGHT] or joystick.get_axis(0)>DEADZONE or joystick.get_button(3):
+        if keys[pygame.K_RIGHT] or (joystick and (joystick.get_axis(0)>DEADZONE or joystick.get_button(3))):
             #print "right"
             self.velx = SHIP_ACC
-        if keys[pygame.K_UP] or joystick.get_axis(1)<-DEADZONE or joystick.get_button(0):
+        if keys[pygame.K_UP] or (joystick and (joystick.get_axis(1)<-DEADZONE or joystick.get_button(0))):
             #print "up"
             self.vely = -SHIP_ACC
-        if keys[pygame.K_DOWN] or joystick.get_axis(1)>DEADZONE or joystick.get_button(1):
+        if keys[pygame.K_DOWN] or (joystick and (joystick.get_axis(1)>DEADZONE or joystick.get_button(1))):
             #print "down"
             self.vely = SHIP_ACC
-        if keys[pygame.K_SPACE] or joystick.get_button(11):
+        if keys[pygame.K_SPACE] or (joystick and joystick.get_button(11)):
             bul = Bullet(self.x,self.y-50,BLUE,(0,-1),320,self.bullets)
 
         self.velx = min(self.velx, self.health*2)
@@ -287,10 +287,10 @@ class Player(Killable):
         self.vely = min(self.vely, self.health)
         self.vely = max(self.vely, -self.health)
 
-        if not (keys[pygame.K_UP] or keys[pygame.K_DOWN] or math.fabs(joystick.get_axis(1))>DEADZONE or joystick.get_button(0) or joystick.get_button(1)):
+        if not (keys[pygame.K_UP] or keys[pygame.K_DOWN] or (joystick and (math.fabs(joystick.get_axis(1))>DEADZONE or joystick.get_button(0) or joystick.get_button(1)))):
             #print "dfsdfsdfs"
             self.vely = 0
-        if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT] or math.fabs(joystick.get_axis(0))>DEADZONE or joystick.get_button(2) or joystick.get_button(3)):
+        if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT] or (joystick and (math.fabs(joystick.get_axis(0))>DEADZONE or joystick.get_button(2) or joystick.get_button(3)))):
             #print "aaaoieuroiuo"
             self.velx = 0
             

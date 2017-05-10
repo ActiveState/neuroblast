@@ -19,20 +19,21 @@ class Brain:
     def learn(self):
         # Builds the model based on the dataset to this point
         # Create a n * 4 matrix for the input data
-        x = np.empty((0,4))
-        y = np.empty((0))
-        
+        #[list(item) for item in self.mapShots.it]
+        x = []
+        #y = np.empty((0))
+        y = []
         #Step 1, build Numpy Arrays for complete data points
         for k,v in self.mapShots.iteritems():
             # Convert our tuple to a numpy array
-            a = np.asarray(v)
             if k in self.mapHits:
-                # Add a new row to our numpy array - This does not work! ERROR
-                # Says that they have to be the same shape... a should be 1x4?
-                x = np.concatenate((x,a),axis=0)
-                #print x
-                y = np.append(y,self.mapHits[k])       
+                a = list(v)
+                x.append(a)
+                #y = np.append(y,self.mapHits[k])
+                y.append(self.mapHits[k])
         
+        #print x
+        #print y
         # Fit the data to the model        
         self.model.fit(x,y,epochs=150,batch_size=10)
         scores = self.model.evaluate(x, y)
@@ -47,5 +48,4 @@ class Brain:
 
     def record_miss(self, bullet):
         self.mapHits[bullet] = 0
-
 

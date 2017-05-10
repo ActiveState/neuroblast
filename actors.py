@@ -3,6 +3,7 @@ import pygame
 import math
 from utils import *
 from random import randrange
+import numpy as np
 
 
 
@@ -177,7 +178,7 @@ class Enemy(Killable):
             self.anim.play()
           
         
-    def update(self, screen, event_queue, dt, (player_x,player_y),(player_velx,player_vely)):
+    def update(self, screen, event_queue, dt, (player_x,player_y),(player_velx,player_vely), trainingMode):
         if not self.alive():
             return
             
@@ -193,15 +194,20 @@ class Enemy(Killable):
                 self.canfire = True
                 self.bulcount = 0
 
+        dx = self.x - player_x
+        dy = self.y - player_y
+        du = self.velx - player_velx
+        dv = self.vely - player_vely
+
         # x is param that is the player's x position
-        if math.fabs(self.x-player_x) < 5 and self.canfire:
-            bul = Bullet(self.x,self.y+50,RED,(0,1),160,self.bullets,self.brain)
-            dx = self.x - player_x
-            dy = self.y - player_y
-            du = self.velx - player_velx
-            dv = self.vely - player_vely
-            self.brain.add_shot(bul, dx, dy, du, dv)
-            self.canfire = False
+        #if math.fabs(self.x-player_x) < 5 and self.canfire:
+
+        if self.canfire:
+            print trainingMode
+            if (trainingMode and randrange(0,100)<10) or (not trainingMode and self.brain.model.predict(np.array([list((dx,dy,du,dv))]))):
+                bul = Bullet(self.x,self.y+50,RED,(0,1),160,self.bullets,self.brain)
+                self.brain.add_shot(bul, dx, dy, du, dv)
+                self.canfire = False
 
 class Player(Killable):
     def __init__(self,bulletgroup):

@@ -13,7 +13,7 @@ class GameState(object):
         return self
 
 class Play(GameState):
-    def __init__(self):
+    def __init__(self, trainingMode):
         self.brain = Brain();
         self.enemyBullets = pygame.sprite.Group()
         self.userBullets = pygame.sprite.Group()
@@ -27,10 +27,11 @@ class Play(GameState):
         self.score = 0
         self.spawntimer = 0
         self.spawnbreak = 8
+        self.trainingMode = trainingMode
 
     def update(self, screen, event_queue, dt, clock, joystick):
         self.player.update(screen, event_queue, dt,joystick)
-        self.enemies.update(screen, event_queue, dt, (self.player.x,self.player.y), (self.player.velx,self.player.vely))
+        self.enemies.update(screen, event_queue, dt, (self.player.x,self.player.y), (self.player.velx,self.player.vely), self.trainingMode)
 
         # Spawn new enemies
         self.spawntimer += dt
@@ -86,8 +87,9 @@ class Play(GameState):
         displaytext("Lives: "+str(self.player.lives) , 16, 500, 20, WHITE, screen)
         
         if not(self.player.alive()):
-            self.brain.learn()
-            return GameOver() 
+            if (self.trainingMode):
+                self.brain.learn()
+            return Menu() 
 
         return self
 
@@ -132,10 +134,12 @@ class Leaderboard(GameState):
 # Only one "GameState" object can exist at one time
 class Menu(GameState):
     def __init__(self):
-        self.menu_selection = 1
+        self.menu_selection = 2
     def update(self, screen, event_queue, dt,clock,joystick):
         nextState = self
         displaytext('Play', 32, screen.get_width() / 4 - 20, screen.get_height() * 3 / 4
+                    - 80, WHITE, screen)
+        displaytext('Train', 32, screen.get_width() / 4 - 20, screen.get_height() * 3 / 4
                     - 40, WHITE, screen)
         displaytext('Exit', 32, screen.get_width() / 4 - 20, screen.get_height() * 3 / 4,
                     WHITE, screen)
@@ -149,14 +153,20 @@ class Menu(GameState):
         # Each game state processes its own input queue in its own way to avoid messy input logic
         for event in event_queue:
             if event.type == pygame.KEYDOWN or event.type == pygame.JOYBUTTONDOWN:
-                if (event.type == pygame.KEYDOWN and (event.key == pygame.K_DOWN or event.key == pygame.K_UP)) or (event.type == pygame.JOYBUTTONDOWN and (event.button == 0 or event.button == 1)) or (event.type == pygame.JOYAXISMOTION and (event.axis == 1 or math.fabs(event.value) >= 0.5)):
-                    if self.menu_selection == 0:
-                        self.menu_selection = 1
-                    else:
+                if (event.type == pygame.KEYDOWN and (event.key == pygame.K_DOWN)) or (event.type == pygame.JOYBUTTONDOWN and (event.button == 1)) or (event.type == pygame.JOYAXISMOTION and (event.axis == 1 or event.value >= DEADZONE)):
+                    self.menu_selection -= 1
+                    if self.menu_selection == -1:
+                        self.menu_selection = 2
+                if (event.type == pygame.KEYDOWN and (event.key == pygame.K_UP)) or (event.type == pygame.JOYBUTTONDOWN and (event.button == 0)) or (event.type == pygame.JOYAXISMOTION and (event.axis == 1 or event.value <= -DEADZONE)):
+                    self.menu_selection += 1
+                    if self.menu_selection == 3:
                         self.menu_selection = 0
                 if (event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN) or (event.type == pygame.JOYBUTTONDOWN and event.button == 11):
-                    if self.menu_selection == 1:
-                        nextState = Play()
+                    if self.menu_selection == 2:
+                        nextState = Play(False)
+                    elif self.menu_selection == 1:
+                        print "TRAINING MODE"
+                        nextState = Play(True)
                     else:
                         nextState = None
         return nextState

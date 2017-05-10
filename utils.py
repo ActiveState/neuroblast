@@ -16,6 +16,8 @@ DEADZONE = 0.25
 ## Constants
 MAX_STARS = 250
 
+trainedBrain = None
+
 def loadfont(size):
     global font
     font = pygame.freetype.Font('./De Valencia (beta).otf', size)

@@ -1,4 +1,5 @@
 import pygame
+import utils
 from utils import *
 from actors import *
 from brain import Brain
@@ -14,7 +15,12 @@ class GameState(object):
 
 class Play(GameState):
     def __init__(self, trainingMode):
-        self.brain = Brain();
+        if utils.trainedBrain:
+            self.brain = utils.trainedBrain
+            print "ADDING A TRAINED BRAIN "+str(self.brain.id)
+        else:
+            self.brain = Brain()
+            print "CREATING A NEW BRAIN "+str(self.brain.id)
         self.enemyBullets = pygame.sprite.Group()
         self.userBullets = pygame.sprite.Group()
         self.userGroup = pygame.sprite.Group()
@@ -89,6 +95,7 @@ class Play(GameState):
         if not(self.player.alive()):
             if (self.trainingMode):
                 self.brain.learn()
+                utils.trainedBrain = self.brain
             return Menu() 
 
         return self

@@ -203,7 +203,6 @@ class Enemy(Killable):
         #if math.fabs(self.x-player_x) < 5 and self.canfire:
 
         if self.canfire:
-            print trainingMode
             if (trainingMode and randrange(0,100)<10) or (not trainingMode and self.brain.model.predict(np.array([list((dx,dy,du,dv))]))):
                 bul = Bullet(self.x,self.y+50,RED,(0,1),160,self.bullets,self.brain)
                 self.brain.add_shot(bul, dx, dy, du, dv)

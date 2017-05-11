@@ -8,8 +8,9 @@ import numpy as np
 
 
 # Global Init stuff should have a proper home once not placeholder art
-spritesheet = pygame.image.load("spaceship_sprite_package_by_kryptid.png")
-spritesheet.set_colorkey(spritesheet.get_at((0, 0)))
+#spritesheet = pygame.image.load("spaceship_sprite_package_by_kryptid.png")
+spritesheet = pygame.image.load("python-sprites.png")
+#spritesheet.set_colorkey(spritesheet.get_at((0, 0)))
 
 class SpriteSequence(object):
     def __init__(self,name,sheet,rect,cols, rows, padding,interval, loop, cb):
@@ -65,15 +66,28 @@ class SpriteSequence(object):
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, color, direction, speed, container, brain = None):
         pygame.sprite.Sprite.__init__(self, container)
-        self.image = pygame.Surface((10, 10), pygame.SRCALPHA, 32)
-        self.image = self.image.convert_alpha()
-        self.col = list(color)
-        for i in range(5, 0, -1):
-            self.col[0] = color[0] * float(i) / 5
-            self.col[1] = color[1] * float(i) / 5
-            self.col[2] = color[2] * float(i) / 5
-            pygame.draw.circle(self.image, tuple(self.col), (5, 5), i,
-                               0)
+
+        self.image = pygame.Surface((16,16), flags=pygame.SRCALPHA)
+        self.rect = self.image.get_rect()
+        basex = 423
+        if color==RED:
+            basex += 96
+        ## Generate the sprite image from spritesheet
+        ssrect = pygame.Rect((basex,710,16,16))
+        global spritesheet
+        self.image.blit(spritesheet,(0,0),ssrect)
+        #self.image.convert()
+        #self.image.set_colorkey(self.image.get_at((0, 0)))
+
+
+#        self.image = pygame.Surface((10, 10), pygame.SRCALPHA, 32)
+#        self.image = self.image.convert_alpha()
+#        self.col = list(color)
+#        for i in range(5, 0, -1):
+#            self.col[0] = color[0] * float(i) / 5
+#            self.col[1] = color[1] * float(i) / 5
+#            self.col[2] = color[2] * float(i) / 5
+#            pygame.draw.circle(self.image, tuple(self.col), (5, 5), i                              0)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.direction = direction
@@ -86,7 +100,7 @@ class Bullet(pygame.sprite.Sprite):
         x += self.direction[0] * self.speed * dt
         self.rect.center = (x, y)
         # TODO make the bounds constants or dynamic
-        if y <= 0 or y >= 720 or x <= 0 or x >= 1280:
+        if y <= 0 or y >= 720 or x <= 0 or x >= 640:
             if self.brain:
                 self.brain.record_miss(self)
             self.kill()
@@ -135,14 +149,14 @@ class Enemy(Killable):
         self.velx = 0
         self.vely = 16       # wish there was a vector class
         self.bullets = bulletgroup
-        self.image = pygame.Surface((94,100))
+        self.image = pygame.Surface((96,192))
         self.rect = self.image.get_rect()
         self.cooldown = 0.1
         self.canfire = True
         self.bulcount = 0
         self.brain = brain
         ## Generate the sprite image from spritesheet
-        ssrect = pygame.Rect((380,0,94,100))
+        ssrect = pygame.Rect((96,192,96,192))
         global spritesheet
         self.image.blit(spritesheet,(0,0),ssrect)
         self.image.convert()
@@ -150,9 +164,13 @@ class Enemy(Killable):
         self.rect.center = (self.x, self.y)
         self.spawntime = pygame.time.get_ticks()
         self.deadcb = self.amdead
-        self.hitAnim = SpriteSequence("hit",spritesheet,pygame.Rect(96,765,31,31),4,2,1,0.1,False,None)
-        self.blowAnim = SpriteSequence("blow",spritesheet,pygame.Rect(0,202,94,100),4,2,1,0.1,False,self.onAnimComplete)
- 
+        self.idleAnim = SpriteSequence("idle",spritesheet,pygame.Rect(96,192,96,192),7,1,0,0.1,True,None)
+        self.hitAnim = SpriteSequence("hit",spritesheet,pygame.Rect(96,480,96,96),8,1,0,0.1,False,None)
+        self.blowAnim = SpriteSequence("blow",spritesheet,pygame.Rect(96,384,96,96),8,1,0,0.1,False,self.onAnimComplete)
+        self.idleAnim.play()
+
+
+
     def onAnimComplete(self,name):
         if name == "blow":
             #print "BLOW ANIM COMPLETE, DYING"
@@ -162,7 +180,7 @@ class Enemy(Killable):
         #print self
         #print "ENEMY POS: "+str(self.x)+","+str(self.y)
         #print "OFFSET" + str(self.animoffset)
-        self.playanim("blow",(self.x-47,self.y-50))
+        self.playanim("blow",(self.x-48,self.y-24))
  
       
     def playanim(self,name,offset):
@@ -187,6 +205,9 @@ class Enemy(Killable):
         self.y += self.vely * dt
 
         self.rect.center = (self.x, self.y)
+
+        self.image.fill((0,0,0))
+        self.idleAnim.update(self.image,(0,0),dt)
         
         if not(self.canfire):
             self.bulcount += dt
@@ -204,7 +225,7 @@ class Enemy(Killable):
 
         if self.canfire:
             if (trainingMode and randrange(0,100)<10) or (not trainingMode and self.brain.model.predict(np.array([list((dx,dy,du,dv))]))==1):
-                bul = Bullet(self.x,self.y+50,RED,(0,1),160,self.bullets,self.brain)
+                bul = Bullet(self.x,self.y+96,RED,(0,1),160,self.bullets,self.brain)
                 self.brain.add_shot(bul, dx, dy, du, dv)
                 self.canfire = False
 
@@ -212,22 +233,24 @@ class Player(Killable):
     def __init__(self,bulletgroup):
         super(Player, self).__init__()
         # Player specifc init stuff here
+        # This is a dirty hack
+        global spritesheet
+        spritesheet.convert_alpha()
         self.x = 320
         self.y = 500
         self.velx = 0
         self.vely = 0       # wish there was a vector class
         self.deadcb = self.amdead
         self.bullets = bulletgroup
-        self.image = pygame.Surface((94,100))
+        self.image = pygame.Surface((96,96))
         self.rect = self.image.get_rect()
         ## Generate the sprite image from spritesheet
-        ssrect = pygame.Rect((0,0,94,100))
-        global spritesheet
+        ssrect = pygame.Rect((96,96,96,96))
         self.image.blit(spritesheet,(0,0),ssrect)
         self.image.convert()
         self.image.set_colorkey(self.image.get_at((0, 0)))
-        self.hitAnim = SpriteSequence("hit",spritesheet,pygame.Rect(96,765,31,31),4,2,1,0.1,False,None)
-        self.blowAnim = SpriteSequence("blow",spritesheet,pygame.Rect(0,202,94,100),4,2,1,0.1,False,self.onAnimComplete)
+        self.hitAnim = SpriteSequence("hit",spritesheet,pygame.Rect(96,480,96,96),8,1,0,0.1,False,None)
+        self.blowAnim = SpriteSequence("blow",spritesheet,pygame.Rect(96,384,96,96),8,1,0,0.1,False,self.onAnimComplete)
  
     def onAnimComplete(self,name):
         if name == "blow":
@@ -238,7 +261,7 @@ class Player(Killable):
     
     def amdead(self):
         #print str(self.x)+","+str(self.y)
-        self.playanim("blow",(self.x-47,self.y-50))
+        self.playanim("blow",(self.x-48,self.y-48))
     
     def playanim(self,name,offset):
         if self.anim != self.blowAnim and name=="hit":
@@ -285,7 +308,7 @@ class Player(Killable):
             #print "down"
             self.vely = SHIP_ACC
         if keys[pygame.K_SPACE] or (joystick and joystick.get_button(11)):
-            bul = Bullet(self.x,self.y-50,BLUE,(0,-1),320,self.bullets)
+            bul = Bullet(self.x,self.y-42,BLUE,(0,-1),320,self.bullets)
 
         self.velx = min(self.velx, self.health*2)
         self.velx = max(self.velx, -self.health*2)
@@ -299,9 +322,9 @@ class Player(Killable):
             #print "aaaoieuroiuo"
             self.velx = 0
             
-        if self.x+(self.velx*dt)>640-47 or self.x+(self.velx*dt)<47:
+        if self.x+(self.velx*dt)>640-48 or self.x+(self.velx*dt)<48:
             self.velx = 0
-        if self.y+(self.vely*dt)>720-50 or self.y+(self.vely*dt)<50:
+        if self.y+(self.vely*dt)>720-48 or self.y+(self.vely*dt)<48:
             self.vely = 0
             
         self.x += self.velx * dt

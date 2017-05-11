@@ -31,7 +31,7 @@ screen.set_alpha(None)
 
 pygame.display.set_caption("Bit Blaster")
 
-background = pygame.image.load('Cygnus_Wall.jpg')
+background = pygame.image.load('python-game_background.png')
 bgsize = background.get_size()
 w, h = bgsize
 

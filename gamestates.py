@@ -29,7 +29,7 @@ class Play(GameState):
         self.enemy = Enemy(self.enemyBullets, self.brain)
         self.userGroup.add(self.player)
         self.enemies.add(self.enemy)
-        self.player.lives = 0
+        self.player.lives = 3
         self.score = 0
         self.spawntimer = 0
         self.spawnbreak = 8

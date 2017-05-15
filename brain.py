@@ -20,7 +20,7 @@ class Brain:
 
         self.id = randrange(0,100)
         # create model
-        self.model = NeuralNetwork([4, 6, 4, 1])
+        self.model = NeuralNetwork([4, 6, 4, 4, 1])
  
     def learn(self):
         # Builds the model based on the dataset to this point

@@ -78,9 +78,9 @@ while not done:
     for event in event_queue:
         if event.type == pygame.QUIT:
             done = True
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                done = True
+        #if event.type == pygame.KEYDOWN:
+            #if event.key == pygame.K_ESCAPE:
+                #done = True
 
     # --- Game logic should go here
     topY += scrollSpeed

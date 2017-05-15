@@ -49,7 +49,8 @@ class Play(GameState):
             player_hit = pygame.sprite.spritecollide(self.player,self.enemyBullets, True)
             for bullet in player_hit:
                 self.brain.record_hit(bullet)
-                self.player.TakeDamage(20)
+                if not (self.trainingMode):
+                    self.player.TakeDamage(20)
                 self.player.playanim("hit",(bullet.rect.x,bullet.rect.y))
         
             
@@ -92,6 +93,16 @@ class Play(GameState):
         displaytext("Health: "+str(self.player.health), 16, 350, 20, WHITE, screen)
         displaytext("Lives: "+str(self.player.lives) , 16, 500, 20, WHITE, screen)
         
+
+        for event in event_queue:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    if (self.trainingMode):
+                        self.brain.learn()
+                        utils.trainedBrain = self.brain
+                    return Menu()
+                        
+
         if not(self.player.alive()):
             if (self.trainingMode):
                 self.brain.learn()

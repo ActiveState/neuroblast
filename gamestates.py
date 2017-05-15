@@ -29,7 +29,7 @@ class Play(GameState):
         self.enemy = Enemy(self.enemyBullets, self.brain)
         self.userGroup.add(self.player)
         self.enemies.add(self.enemy)
-        self.player.lives = 3
+        self.player.lives = 0
         self.score = 0
         self.spawntimer = 0
         self.spawnbreak = 8
@@ -96,38 +96,40 @@ class Play(GameState):
             if (self.trainingMode):
                 self.brain.learn()
                 utils.trainedBrain = self.brain
-            return Menu() 
+                return Menu()
+            else:
+                return GameOver(self.score) 
 
         return self
 
 class GameOver(GameState):
-    def __init__(self):
+    def __init__(self,score):
+        print "Creating gameover state with score "+str(score)
+        self.score = score
         self.name = ""
         gameover.pressed = ""
     def update(self,screen,event_queue,dt,clock, joystick):
-        nextState = self
-        if self.name == "":
-            self.name = gameover.enter_text(event_queue,screen, 8)
+        nextState = self        
+        self.name = gameover.enter_text(event_queue,screen, 8)
         for event in event_queue:
             if event.type == pygame.KEYUP:
-                if event.key == pygame.K_RETURN and self.name == "":
+                if event.key == pygame.K_RETURN:
                     self.name = gameover.pressed
-                elif event.key == pygame.K_RETURN and self.name != "":
-                    nextState = Leaderboard()       
-        
-        
+                    leaderboard.StoreScore(self.name,self.score)
+                    nextState = Leaderboard(self.name)                    
         return nextState
 
 class Leaderboard(GameState):
-    def __init__(self):
+    def __init__(self,name):
+        self.name = name
         self.highscores = leaderboard.GetScores()
         #print "init gameover state"
         
-    def update(self,screen,event_queue,dt,clock):
+    def update(self,screen,event_queue,dt,clock,joystick):
         nextState = self
         #print "in gameover state"
         #print self.highscores
-        leaderboard.DisplayLeaderBoard(screen,self.highscores,"Bob")
+        leaderboard.DisplayLeaderBoard(screen,self.highscores,self.name)
         for event in event_queue:
             if event.type == pygame.KEYDOWN:
                 nextState = Menu()
@@ -153,7 +155,6 @@ class Menu(GameState):
         screen.blit(self.logo,(screen.get_width() / 4 - 265,screen.get_height() * 3 / 4-500))
         screen.blit(self.intel,(screen.get_width() / 4 - 300,screen.get_height()-130))
         screen.blit(self.activestate,(screen.get_width() - 980,screen.get_height() - 130))
-
 
         nextState = self
         displaytext('Play', 32, screen.get_width() / 4 - 20, screen.get_height() * 3 / 4

@@ -11,6 +11,8 @@ def enter_text(eq, screen, max_length, lower = False, upper = False, title = Fal
     returns user name input of max length "max length and with optional
     string operation performed
     """
+
+    #print "listening for input"
     
     global pressed
     BLUE = (0,0,255)
@@ -24,8 +26,9 @@ def enter_text(eq, screen, max_length, lower = False, upper = False, title = Fal
     pygame.time.set_timer(BLINK_EVENT, 800)
     blinky = cycle(["_", " "])
     next_blink = next(blinky)
+    displaytext('GAME OVER', 16, 320,60, WHITE, screen)        
 
-    displaytext('Enter your name:', 16, 130,125, WHITE, screen)        
+    displaytext('Enter your name:', 16, 320,125, WHITE, screen)        
 
     for event in eq:
         if event.type == BLINK_EVENT:
@@ -49,9 +52,9 @@ def enter_text(eq, screen, max_length, lower = False, upper = False, title = Fal
         
     # only draw underscore if input is not at max character length
     if len(pressed) < max_length:
-        displaytext(pressed + next_blink, 16, 130, 180, WHITE, screen)        
+        displaytext(pressed + next_blink, 16, 320, 180, WHITE, screen)        
     else:
-        displaytext(pressed, 15, 130, 180, WHITE, screen)        
+        displaytext(pressed, 15, 320, 180, WHITE, screen)        
 
     # perform any selected string operations
     if lower: pressed = pressed.lower()

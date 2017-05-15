@@ -3,6 +3,7 @@ from pymongo import DESCENDING
 from datetime import datetime
 import pygame
 from utils import *
+import sys
 
 # Initialize connect at boot
 client = MongoClient('localhost', 27017)
@@ -26,10 +27,14 @@ def DisplayLeaderBoard(screen, highscores, name):
     
 
 def StoreScore(name,score):
+    print "Storing "+name+" score: "+str(score)
     scores.insert({"name":name,"score":score,"time":str(datetime.now())})
     
 def GetScores():
     return list(scores.find().sort("score",DESCENDING).limit(10))
+
+def ClearScores():
+    scores.remove({})   
 
 def Test():
     # Clear scores first for testing
@@ -40,3 +45,7 @@ def Test():
     scores.insert({"name":"AAA","score":744,"time":str(datetime.now())})
 
     print list(scores.find().sort("score",DESCENDING))
+
+# For clearing db
+if (len(sys.argv) > 1) and (sys.argv[1] == '-clear'):
+    ClearScores()

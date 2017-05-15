@@ -227,7 +227,7 @@ class Enemy(Killable):
 #            if (trainingMode and randrange(0,100)<10) or (not trainingMode and self.brain.model.predict(np.array([list((dx,dy,du,dv))]))>=0.5):
             if (trainingMode and randrange(0,100)<10) or (not trainingMode and self.brain.model.think([dx,dy,du,dv])>=0.5):
                 bul = Bullet(self.x,self.y+96,RED,(0,1),160,self.bullets,self.brain)
-                self.brain.add_shot(bul, dx, dy, du, dv)
+                self.brain.add_shot(bul, dx/640, dy/720, du/50, dv/50)
                 self.canfire = False
 
 class Player(Killable):

@@ -65,6 +65,7 @@ class Neuron():
         #circle = pyplot.Circle((self.x, self.y), radius=parameters.neuron_radius, fill=True, color=(0.2, 0.2, 0), zorder=3)
         #print self.output
         #outer_glow = pyplot.Circle((self.x, self.y), radius=parameters.neuron_radius * 1.5, fill=True, color=(0.5, 0.5, 0), zorder=4, alpha=0.5)
+        #pygame.draw.circle(screen,(120,120,220,int(self.output*255)),(self.x+lo, self.y+to),int(parameters.neuron_radius*1.5))
         #ax.add_patch(circle)
         #ax.add_patch(outer_glow)
         #pyplot.text(self.x + 0.8, self.y, round(self.output, 2))

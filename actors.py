@@ -215,10 +215,11 @@ class Enemy(Killable):
                 self.canfire = True
                 self.bulcount = 0
 
-        dx = self.x - player_x
-        dy = self.y - player_y
-        du = self.velx - player_velx
-        dv = self.vely - player_vely
+        # Normalized values
+        dx = (self.x - player_x) / 640
+        dy = (self.y - player_y) / 720
+        du = (self.velx - player_velx) / 60
+        dv = (self.vely - player_vely) / 60
 
         # x is param that is the player's x position
         #if math.fabs(self.x-player_x) < 5 and self.canfire:
@@ -227,7 +228,8 @@ class Enemy(Killable):
 #            if (trainingMode and randrange(0,100)<10) or (not trainingMode and self.brain.model.predict(np.array([list((dx,dy,du,dv))]))>=0.5):
             if (trainingMode and randrange(0,100)<10) or (not trainingMode and self.brain.model.think([dx,dy,du,dv])>=0.5):
                 bul = Bullet(self.x,self.y+96,RED,(0,1),160,self.bullets,self.brain)
-                self.brain.add_shot(bul, dx/640, dy/720, du/50, dv/50)
+                #self.brain.add_shot(bul, dx/640, dy/720, du/60, dv/60)
+                self.brain.add_shot(bul, dx, dy, du, dv)
                 self.canfire = False
 
 class Player(Killable):

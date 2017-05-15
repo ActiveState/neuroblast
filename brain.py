@@ -39,7 +39,7 @@ class Brain:
         
         #print x
         #print y
-        print "Finished training, cumulative error was "+str(cumulative_error)
+        #print "Finished training, cumulative error was "+str(cumulative_error)
         # Fit the data to the model        
         self.trained = True
         

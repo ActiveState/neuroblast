@@ -49,11 +49,11 @@ class Brain:
 
     def record_hit(self, bullet):
         self.mapHits[bullet] = 1
-        self.learn()
+        #self.learn()
 
     def record_miss(self, bullet):
         self.mapHits[bullet] = 0
-        self.learn()
+        #self.learn()
 
     def draw(self,screen):
         #from keras.utils.layer_utils import print_summary

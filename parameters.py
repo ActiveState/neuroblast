@@ -9,7 +9,7 @@ left_margin = 10
 bottom_margin = 2
 error_bar_x_position = 14
 output_y_position = 15
-top_offset = 200
+top_offset = 180
 left_offset = 140
 
 # Parameters for training the network

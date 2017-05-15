@@ -92,6 +92,8 @@ class Play(GameState):
         displaytext("Score: "+str(self.score), 16, 200, 20, WHITE, screen)
         displaytext("Health: "+str(self.player.health), 16, 350, 20, WHITE, screen)
         displaytext("Lives: "+str(self.player.lives) , 16, 500, 20, WHITE, screen)
+
+        displaytext("Neural Net Visualization", 16, 960, 20, WHITE, screen)
         
 
         for event in event_queue:
@@ -102,6 +104,8 @@ class Play(GameState):
                         utils.trainedBrain = self.brain
                     return Menu()
                         
+        if self.trainingMode:
+            self.brain.learn()
 
         if not(self.player.alive()):
             if (self.trainingMode):

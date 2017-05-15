@@ -15,7 +15,8 @@ class Brain:
         self.model = Sequential()
 
         # From what I could gather from the docs, columns came first in the input shape
-        self.model.add(Dense(6, input_shape=(4,), activation='relu'))
+        self.model.add(Dense(4, input_shape=(4,), activation='sigmoid'))
+        self.model.add(Dense(4, activation='sigmoid'))
         self.model.add(Dense(1, activation='sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])        
         

@@ -29,7 +29,7 @@ if (len(sys.argv) > 1) and (sys.argv[1] == '-f'):
 screen = pygame.display.set_mode(resolution, flags)
 screen.set_alpha(None)
 
-pygame.display.set_caption("Bit Blaster")
+pygame.display.set_caption("Neuro/Blast")
 
 background = pygame.image.load('python-game_background.png')
 bgsize = background.get_size()

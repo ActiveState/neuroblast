@@ -142,7 +142,19 @@ class Leaderboard(GameState):
 class Menu(GameState):
     def __init__(self):
         self.menu_selection = 2
+        self.logo = pygame.image.load("neuro-blast_logo.png")
+        self.intel = pygame.image.load("Intel-logo_blue.png")
+        self.activestate = pygame.image.load("as-logo.png")
+        self.intel = pygame.transform.smoothscale(self.intel,(self.intel.get_width()/2,self.intel.get_height()/2))
+        self.activestate = pygame.transform.smoothscale(self.activestate,(self.activestate.get_width()/2,self.activestate.get_height()/2))
+        
     def update(self, screen, event_queue, dt,clock,joystick):
+        # Logos/titles
+        screen.blit(self.logo,(screen.get_width() / 4 - 265,screen.get_height() * 3 / 4-500))
+        screen.blit(self.intel,(screen.get_width() / 4 - 300,screen.get_height()-130))
+        screen.blit(self.activestate,(screen.get_width() - 980,screen.get_height() - 130))
+
+
         nextState = self
         displaytext('Play', 32, screen.get_width() / 4 - 20, screen.get_height() * 3 / 4
                     - 80, WHITE, screen)
@@ -150,10 +162,10 @@ class Menu(GameState):
                     - 40, WHITE, screen)
         displaytext('Exit', 32, screen.get_width() / 4 - 20, screen.get_height() * 3 / 4,
                     WHITE, screen)
-        displaytext('Bit Blaster v1.0', 12, screen.get_width() - 80, screen.get_height() - 20,
-                    WHITE, screen)
-        displaytext('Copyright (C) 2017 ActiveState Software Inc.', 12, screen.get_width() - 80, screen.get_height() - 10,
-                    WHITE, screen)
+        #displaytext('Neuro/Blast v1.0', 12, screen.get_width() - 80, screen.get_height() - 20,
+ #                   WHITE, screen)
+        #displaytext('Copyright (C) 2017 ActiveState Software Inc.', 12, screen.get_width() - 80, screen.get_height() - 10,
+ #                   WHITE, screen)
         displaytext(u'\u00bb', 32, screen.get_width() / 4 - 60, screen.get_height() * 3 / 4
                     - 40*self.menu_selection, WHITE, screen)
 

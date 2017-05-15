@@ -29,7 +29,7 @@ class Play(GameState):
         self.enemy = Enemy(self.enemyBullets, self.brain)
         self.userGroup.add(self.player)
         self.enemies.add(self.enemy)
-        self.player.lives = 0
+        self.player.lives = 3
         self.score = 0
         self.spawntimer = 0
         self.spawnbreak = 8
@@ -85,7 +85,7 @@ class Play(GameState):
             else:
                 self.player.anim = None
                 
-                        
+        self.brain.draw(screen)             
         
         displaytext("FPS:{:.2f}".format(clock.get_fps()) , 16, 60, 20, WHITE, screen)
         displaytext("Score: "+str(self.score), 16, 200, 20, WHITE, screen)

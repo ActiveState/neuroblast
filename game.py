@@ -107,12 +107,12 @@ while not done:
     if state == None:
         done = True
         
-    plotCounter+= clock.get_time()/1000.0
-    if plotCounter>plotUpdateRate:
+#    plotCounter+= clock.get_time()/1000.0
+#    if plotCounter>plotUpdateRate:
         # Get the plotted data and display it on screen
-        surf = plot.plot(np.random.random((640, 360)))
-        screen.blit(surf,(640,0))
-        plotCounter = 0.0
+#        surf = plot.plot(np.random.random((640, 360)))
+#        screen.blit(surf,(640,0))
+#        plotCounter = 0.0
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
     # --- Limit to 60 frames per second

@@ -21,7 +21,7 @@ class Synapse():
         to = parameters.top_offset
         #print "Drawing synapse"
         #line(Surface, color, start_pos, end_pos, width=1)
-        pygame.draw.line(screen,get_synapse_colour(self.weight),(self.x1+lo, self.y1+to), (self.x2+lo, self.y2+to),2)
+        pygame.draw.line(screen,get_synapse_colour(self.weight),(self.x1+lo, self.y1+to), (self.x2+lo, self.y2+to),max(1,int(fabs(self.weight))))
         #line = pyplot.Line2D((self.x1, self.x2), (self.y1, self.y2), lw=fabs(self.weight), color=get_synapse_colour(self.weight), zorder=1)
         #outer_glow = pyplot.Line2D((self.x1, self.x2), (self.y1, self.y2), lw=(fabs(self.weight) * 2), color=get_synapse_colour(self.weight), zorder=2, alpha=self.signal * 0.4)
         #ax.add_line(line)
@@ -57,11 +57,14 @@ class Neuron():
             activity += synapse.weight * synapse.signal
         self.output = sigmoid(activity)
 
-    def draw(self,screen):
+    def draw(self,screen,nsurf):
+        for synapse in self.synapses:
+            synapse.draw(screen)
+        
         #circle(Surface, color, pos, radius, width=0)
         lo = parameters.left_offset
         to = parameters.top_offset
-        pygame.draw.circle(screen,(180,180,200),(self.x+lo, self.y+to),parameters.neuron_radius)
+        pygame.draw.circle(nsurf,(180,180,200),(self.x+lo, self.y+to),parameters.neuron_radius)
         #circle = pyplot.Circle((self.x, self.y), radius=parameters.neuron_radius, fill=True, color=(0.2, 0.2, 0), zorder=3)
         #print self.output
         #outer_glow = pyplot.Circle((self.x, self.y), radius=parameters.neuron_radius * 1.5, fill=True, color=(0.5, 0.5, 0), zorder=4, alpha=0.5)
@@ -69,10 +72,8 @@ class Neuron():
         #ax.add_patch(circle)
         #ax.add_patch(outer_glow)
         #pyplot.text(self.x + 0.8, self.y, round(self.output, 2))
-        displaytext(str(round(self.output, 2)), 16, self.x + 2+lo, self.y+to, BLACK, screen)
+        displaytext(str(round(self.output, 2)), 16, self.x + 2+lo, self.y+to, BLACK, nsurf)
 
-        for synapse in self.synapses:
-            synapse.draw(screen)
 
 
 class Layer():
@@ -96,9 +97,9 @@ class Layer():
         for neuron in self.neurons:
             neuron.think(self.previous_layer)
 
-    def draw(self,screen):
+    def draw(self,screen,nsurf):
         for neuron in self.neurons:
-            neuron.draw(screen)
+            neuron.draw(screen,nsurf)
 
 
 class NeuralNetwork():
@@ -134,9 +135,14 @@ class NeuralNetwork():
 
     def draw(self,screen):
         surf = pygame.Surface((640,720))
+        nsurf = pygame.Surface((640,720))
+        nsurf.fill((255,0,255))
+        nsurf.set_colorkey((255,0,255))
         for layer in self.layers:
-            layer.draw(surf)
+            layer.draw(surf,nsurf)
+
         screen.blit(surf,(640,0))
+        screen.blit(nsurf,(640,0))
 
     def reset_errors(self):
         for layer in self.layers:

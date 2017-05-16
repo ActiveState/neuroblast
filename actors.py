@@ -254,7 +254,9 @@ class Player(Killable):
         self.image.set_colorkey(self.image.get_at((0, 0)))
         self.hitAnim = SpriteSequence("hit",spritesheet,pygame.Rect(96,480,96,96),8,1,0,0.1,False,None)
         self.blowAnim = SpriteSequence("blow",spritesheet,pygame.Rect(96,384,96,96),8,1,0,0.1,False,self.onAnimComplete)
- 
+        self.idleAnim = SpriteSequence("idle",spritesheet,pygame.Rect(96,576,96,192),8,1,0,0.1,True,None)
+        self.idleAnim.play()
+
     def onAnimComplete(self,name):
         if name == "blow":
             #print "BLOW ANIM COMPLETE, DYING"
@@ -283,6 +285,9 @@ class Player(Killable):
     def update(self, screen, event_queue, dt, joystick):
         
         self.rect.center = (self.x, self.y)
+
+        self.image.fill((0,0,0))
+        self.idleAnim.update(self.image,(0,0),dt)
 
         if self.blinking:
             self.blinkcount += dt

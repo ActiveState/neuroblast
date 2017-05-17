@@ -196,7 +196,7 @@ class Enemy(Killable):
             self.anim.play()
           
         
-    def update(self, screen, event_queue, dt, (player_x,player_y),(player_velx,player_vely), trainingMode):
+    def update(self, screen, event_queue, dt, (player_x,player_y),(player_velx,player_vely), trainingMode, netmodel):
         if not self.alive():
             return
             
@@ -225,8 +225,12 @@ class Enemy(Killable):
         #if math.fabs(self.x-player_x) < 5 and self.canfire:
 
         if self.canfire:
-#            if (trainingMode and randrange(0,100)<10) or (not trainingMode and self.brain.model.predict(np.array([list((dx,dy,du,dv))]))>=0.5):
-            if (trainingMode and randrange(0,100)<10) or (not trainingMode and self.brain.model.think([dx,dy,du,dv])>=0.5):
+             if (trainingMode and randrange(0,100)<10) or ((netmodel == 1 and not trainingMode and self.brain.keras.predict(np.array([list((dx,dy,du,dv))]))>=0.5) or (netmodel == 0 and not trainingMode and self.brain.model.think([dx,dy,du,dv])>=0.5)):
+#            if (trainingMode and randrange(0,100)<10) or (not trainingMode and self.brain.model.think([dx,dy,du,dv])>=0.5):
+
+                # Cheat to do parallel visualization, sort of performance intensive
+                if (not trainingMode and netmodel == 1):
+                    self.brain.model.think([dx,dy,du,dv])
                 bul = Bullet(self.x,self.y+96,RED,(0,1),160,self.bullets,self.brain)
                 #self.brain.add_shot(bul, dx/640, dy/720, du/60, dv/60)
                 self.brain.add_shot(bul, dx, dy, du, dv)

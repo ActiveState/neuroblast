@@ -20,12 +20,18 @@ import sys
 pygame.init()
 loadfont(24)
 
+# 0 is default, internal neural net, 1 is keras/tensorflow
+netmodel = 0
 # Configure screen TODO: Should there be a config object or something to contain this?
 resolution = (1280, 720)
 #flags = pygame.FULLSCREEN | pygame.DOUBLEBUF
 flags = pygame.DOUBLEBUF
 if (len(sys.argv) > 1) and (sys.argv[1] == '-f'):
     flags |= pygame.FULLSCREEN
+
+if (len(sys.argv)>1) and (sys.argv[-1] == '-t'):
+    netmodel = 1
+
 screen = pygame.display.set_mode(resolution, flags)
 screen.set_alpha(None)
 
@@ -102,7 +108,7 @@ while not done:
     # --- Drawing code should go here
     move_and_draw_stars(screen)
     ## Gamestate update
-    state = state.update(screen, event_queue, clock.get_time()/1000.0, clock, joystick)
+    state = state.update(screen, event_queue, clock.get_time()/1000.0, clock, joystick, netmodel)
     ## Trap exits from gamestate
     if state == None:
         done = True

@@ -196,10 +196,13 @@ class Enemy(Killable):
             self.anim.play()
           
         
-    def update(self, screen, event_queue, dt, (player_x,player_y),(player_velx,player_vely), trainingMode, netmodel):
+    def update(self, screen, event_queue, dt, ppos, pvel, trainingMode, netmodel):
         if not self.alive():
             return
-            
+        
+        player_x, player_y = ppos
+        player_velx, player_vely = pvel
+    
         self.velx = math.sin((pygame.time.get_ticks()-self.spawntime)/1800) * 40 
         self.x += self.velx * dt
         self.y += self.vely * dt

@@ -17,10 +17,10 @@ class Play(GameState):
     def __init__(self, trainingMode):
         if utils.trainedBrain:
             self.brain = utils.trainedBrain
-            print "ADDING A TRAINED BRAIN "+str(self.brain.id)
+            print ("ADDING A TRAINED BRAIN "+str(self.brain.id))
         else:
             self.brain = Brain()
-            print "CREATING A NEW BRAIN "+str(self.brain.id)
+            print ("CREATING A NEW BRAIN "+str(self.brain.id))
         self.enemyspeed = 16
         self.enemyBullets = pygame.sprite.Group()
         self.userBullets = pygame.sprite.Group()
@@ -66,7 +66,7 @@ class Play(GameState):
         self.userBullets.draw(screen)
 
         enemies_hit = pygame.sprite.groupcollide(self.enemies,self.userBullets,False,True)
-        for enemy, bullets in enemies_hit.iteritems():
+        for enemy, bullets in enemies_hit.items():
             enemy.TakeDamage(10)
             for b in bullets:
                 enemy.playanim("hit",(b.rect.x,b.rect.y))
@@ -124,7 +124,7 @@ class Play(GameState):
 
 class GameOver(GameState):
     def __init__(self,score):
-        print "Creating gameover state with score "+str(score)
+        print ("Creating gameover state with score "+str(score))
         self.score = score
         self.name = ""
         gameover.pressed = ""
@@ -167,8 +167,8 @@ class Menu(GameState):
         self.logo = pygame.image.load("neuro-blast_logo.png")
         self.intel = pygame.image.load("Intel-logo_blue.png")
         self.activestate = pygame.image.load("as-logo.png")
-        self.intel = pygame.transform.smoothscale(self.intel,(self.intel.get_width()/2,self.intel.get_height()/2))
-        self.activestate = pygame.transform.smoothscale(self.activestate,(self.activestate.get_width()/2,self.activestate.get_height()/2))
+        self.intel = pygame.transform.smoothscale(self.intel,(int(self.intel.get_width()/2),int(self.intel.get_height()/2)))
+        self.activestate = pygame.transform.smoothscale(self.activestate,(int(self.activestate.get_width()/2),int(self.activestate.get_height()/2)))
         
     def update(self, screen, event_queue, dt,clock,joystick, netmodel):
         # Logos/titles
@@ -205,7 +205,7 @@ class Menu(GameState):
                     if self.menu_selection == 2:
                         nextState = Play(False)
                     elif self.menu_selection == 1:
-                        print "TRAINING MODE"
+                        print ("TRAINING MODE")
                         nextState = Play(True)
                     else:
                         nextState = None

@@ -21,7 +21,7 @@ class Synapse():
         to = parameters.top_offset
         #print "Drawing synapse"
         #line(Surface, color, start_pos, end_pos, width=1)
-        pygame.draw.line(screen,get_synapse_colour(self.weight),(self.x1+lo, self.y1+to), (self.x2+lo, self.y2+to),max(1,int(fabs(self.weight))))
+        pygame.draw.line(screen,get_synapse_colour(self.weight),(int(self.x1+lo), int(self.y1+to)), (int(self.x2+lo), int(self.y2+to)),max(1,int(fabs(self.weight))))
         #line = pyplot.Line2D((self.x1, self.x2), (self.y1, self.y2), lw=fabs(self.weight), color=get_synapse_colour(self.weight), zorder=1)
         #outer_glow = pyplot.Line2D((self.x1, self.x2), (self.y1, self.y2), lw=(fabs(self.weight) * 2), color=get_synapse_colour(self.weight), zorder=2, alpha=self.signal * 0.4)
         #ax.add_line(line)
@@ -64,7 +64,7 @@ class Neuron():
         #circle(Surface, color, pos, radius, width=0)
         lo = parameters.left_offset
         to = parameters.top_offset
-        pygame.draw.circle(nsurf,(180,180,200),(self.x+lo, self.y+to),parameters.neuron_radius)
+        pygame.draw.circle(nsurf,(180,180,200),(int(self.x+lo), int(self.y+to)),parameters.neuron_radius)
         #circle = pyplot.Circle((self.x, self.y), radius=parameters.neuron_radius, fill=True, color=(0.2, 0.2, 0), zorder=3)
         #print self.output
         #outer_glow = pyplot.Circle((self.x, self.y), radius=parameters.neuron_radius * 1.5, fill=True, color=(0.5, 0.5, 0), zorder=4, alpha=0.5)
@@ -88,7 +88,7 @@ class Layer():
             self.y = parameters.bottom_margin
         self.neurons = []
         x = layer_left_margin(number_of_neurons)
-        for iteration in xrange(number_of_neurons):
+        for iteration in range(number_of_neurons):
             neuron = Neuron(x, self.y, self.previous_layer)
             self.neurons.append(neuron)
             x += parameters.horizontal_distance_between_neurons

@@ -315,7 +315,7 @@ class Player(Killable):
         if keys[pygame.K_DOWN] or (joystick and (joystick.get_axis(1)>DEADZONE or joystick.get_button(1))):
             #print "down"
             self.vely = SHIP_ACC
-        if keys[pygame.K_SPACE] or (joystick and joystick.get_button(11)):
+        if keys[pygame.K_SPACE] or (joystick and joystick.get_button(0)):
             bul = Bullet(self.x,self.y-42,BLUE,(0,-1),320,self.bullets)
 
         self.velx = min(self.velx, self.health*2)

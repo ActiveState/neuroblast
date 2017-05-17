@@ -21,12 +21,13 @@ class Play(GameState):
         else:
             self.brain = Brain()
             print "CREATING A NEW BRAIN "+str(self.brain.id)
+        self.enemyspeed = 16
         self.enemyBullets = pygame.sprite.Group()
         self.userBullets = pygame.sprite.Group()
         self.userGroup = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.player = Player(self.userBullets)
-        self.enemy = Enemy(self.enemyBullets, self.brain)
+        self.enemy = Enemy(self.enemyBullets, self.brain,self.enemyspeed)
         self.userGroup.add(self.player)
         self.enemies.add(self.enemy)
         self.player.lives = 3
@@ -42,7 +43,9 @@ class Play(GameState):
         # Spawn new enemies
         self.spawntimer += dt
         if self.spawntimer > self.spawnbreak:
-            self.enemies.add(Enemy(self.enemyBullets, self.brain))
+            self.spawnbreak = max(2,self.spawnbreak-0.5)
+            self.enemyspeed = max(0,self.enemyspeed+2)
+            self.enemies.add(Enemy(self.enemyBullets, self.brain,self.enemyspeed))
             self.spawntimer = 0
 
         if not(self.player.blinking):
@@ -64,7 +67,7 @@ class Play(GameState):
 
         enemies_hit = pygame.sprite.groupcollide(self.enemies,self.userBullets,False,True)
         for enemy, bullets in enemies_hit.iteritems():
-            enemy.TakeDamage(20)
+            enemy.TakeDamage(10)
             for b in bullets:
                 enemy.playanim("hit",(b.rect.x,b.rect.y))
             self.score += 50

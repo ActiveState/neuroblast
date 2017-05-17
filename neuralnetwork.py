@@ -104,6 +104,11 @@ class Layer():
 
 class NeuralNetwork():
     def __init__(self, requested_layers):
+        self.surf = pygame.Surface((640,720))
+        self.nsurf = pygame.Surface((640,720))
+        self.nsurf.fill((255,0,255))
+        self.nsurf.set_colorkey((255,0,255))
+
         self.layers = []
         for number_of_neurons in requested_layers:
             self.layers.append(Layer(self, number_of_neurons))
@@ -134,15 +139,13 @@ class NeuralNetwork():
         return self.layers[-1].neurons[0].output
 
     def draw(self,screen):
-        surf = pygame.Surface((640,720))
-        nsurf = pygame.Surface((640,720))
-        nsurf.fill((255,0,255))
-        nsurf.set_colorkey((255,0,255))
+        self.surf.fill((0,0,0))
+        self.nsurf.fill((255,0,255))
         for layer in self.layers:
-            layer.draw(surf,nsurf)
+            layer.draw(self.surf,self.nsurf)
 
-        screen.blit(surf,(640,0))
-        screen.blit(nsurf,(640,0))
+        screen.blit(self.surf,(640,0))
+        screen.blit(self.nsurf,(640,0))
 
     def reset_errors(self):
         for layer in self.layers:

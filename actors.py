@@ -141,13 +141,13 @@ class Killable(pygame.sprite.Sprite):
         self.kill()
 
 class Enemy(Killable):
-    def __init__(self, bulletgroup, brain):
+    def __init__(self, bulletgroup, brain, speed):
         super(Enemy, self).__init__()
         # Enemy specific stuff here
         self.x = randrange(0,450)
         self.y = -50
         self.velx = 0
-        self.vely = 16       # wish there was a vector class
+        self.vely = speed       # wish there was a vector class
         self.bullets = bulletgroup
         self.image = pygame.Surface((96,192))
         self.rect = self.image.get_rect()
@@ -196,7 +196,7 @@ class Enemy(Killable):
             self.anim.play()
           
         
-    def update(self, screen, event_queue, dt, (player_x,player_y),(player_velx,player_vely), trainingMode):
+    def update(self, screen, event_queue, dt, (player_x,player_y),(player_velx,player_vely), trainingMode, netmodel):
         if not self.alive():
             return
             
@@ -225,8 +225,12 @@ class Enemy(Killable):
         #if math.fabs(self.x-player_x) < 5 and self.canfire:
 
         if self.canfire:
-#            if (trainingMode and randrange(0,100)<10) or (not trainingMode and self.brain.model.predict(np.array([list((dx,dy,du,dv))]))>=0.5):
-            if (trainingMode and randrange(0,100)<10) or (not trainingMode and self.brain.model.think([dx,dy,du,dv])>=0.5):
+             if (trainingMode and randrange(0,100)<10) or ((netmodel == 1 and not trainingMode and self.brain.keras.predict(np.array([list((dx,dy,du,dv))]))>=0.5) or (netmodel == 0 and not trainingMode and self.brain.model.think([dx,dy,du,dv])>=0.5)):
+#            if (trainingMode and randrange(0,100)<10) or (not trainingMode and self.brain.model.think([dx,dy,du,dv])>=0.5):
+
+                # Cheat to do parallel visualization, sort of performance intensive
+                if (not trainingMode and netmodel == 1):
+                    self.brain.model.think([dx,dy,du,dv])
                 bul = Bullet(self.x,self.y+96,RED,(0,1),160,self.bullets,self.brain)
                 #self.brain.add_shot(bul, dx/640, dy/720, du/60, dv/60)
                 self.brain.add_shot(bul, dx, dy, du, dv)
@@ -239,6 +243,9 @@ class Player(Killable):
         # This is a dirty hack
         global spritesheet
         spritesheet.convert_alpha()
+        self.cooldown = 0.5
+        self.canfire = True
+        self.bulcount = 0
         self.x = 320
         self.y = 500
         self.velx = 0
@@ -299,8 +306,14 @@ class Player(Killable):
                 self.blinks +=1
                 if (self.blinks == self.blinkcycles):
                     self.blinking = False
-                    self.health = 100      
+                    self.health = 100 
 
+        if not(self.canfire):
+            self.bulcount += dt
+            if self.bulcount>self.cooldown:
+                self.canfire = True
+                self.bulcount = 0
+     
         keys=pygame.key.get_pressed()
 
         if keys[pygame.K_LEFT] or (joystick and (joystick.get_axis(0)<-DEADZONE or joystick.get_button(2))):
@@ -315,8 +328,9 @@ class Player(Killable):
         if keys[pygame.K_DOWN] or (joystick and (joystick.get_axis(1)>DEADZONE or joystick.get_button(1))):
             #print "down"
             self.vely = SHIP_ACC
-        if keys[pygame.K_SPACE] or (joystick and joystick.get_button(0)):
+        if self.canfire and (keys[pygame.K_SPACE] or (joystick and joystick.get_button(0))):
             bul = Bullet(self.x,self.y-42,BLUE,(0,-1),320,self.bullets)
+            self.canfire = False
 
         self.velx = min(self.velx, self.health*2)
         self.velx = max(self.velx, -self.health*2)

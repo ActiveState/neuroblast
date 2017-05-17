@@ -10,7 +10,7 @@ import gameover
 
 # GameState object will return a new state object if it transitions
 class GameState(object):
-    def update(self, screen, event_queue, dt, clock, joystick):
+    def update(self, screen, event_queue, dt, clock, joystick, netmodel):
         return self
 
 class Play(GameState):
@@ -21,12 +21,13 @@ class Play(GameState):
         else:
             self.brain = Brain()
             print "CREATING A NEW BRAIN "+str(self.brain.id)
+        self.enemyspeed = 16
         self.enemyBullets = pygame.sprite.Group()
         self.userBullets = pygame.sprite.Group()
         self.userGroup = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.player = Player(self.userBullets)
-        self.enemy = Enemy(self.enemyBullets, self.brain)
+        self.enemy = Enemy(self.enemyBullets, self.brain,self.enemyspeed)
         self.userGroup.add(self.player)
         self.enemies.add(self.enemy)
         self.player.lives = 3
@@ -35,14 +36,16 @@ class Play(GameState):
         self.spawnbreak = 8
         self.trainingMode = trainingMode
 
-    def update(self, screen, event_queue, dt, clock, joystick):
+    def update(self, screen, event_queue, dt, clock, joystick, netmodel):
         self.player.update(screen, event_queue, dt,joystick)
-        self.enemies.update(screen, event_queue, dt, (self.player.x,self.player.y), (self.player.velx,self.player.vely), self.trainingMode)
+        self.enemies.update(screen, event_queue, dt, (self.player.x,self.player.y), (self.player.velx,self.player.vely), self.trainingMode, netmodel)
 
         # Spawn new enemies
         self.spawntimer += dt
         if self.spawntimer > self.spawnbreak:
-            self.enemies.add(Enemy(self.enemyBullets, self.brain))
+            self.spawnbreak = max(2,self.spawnbreak-0.5)
+            self.enemyspeed = max(0,self.enemyspeed+2)
+            self.enemies.add(Enemy(self.enemyBullets, self.brain,self.enemyspeed))
             self.spawntimer = 0
 
         if not(self.player.blinking):
@@ -64,7 +67,7 @@ class Play(GameState):
 
         enemies_hit = pygame.sprite.groupcollide(self.enemies,self.userBullets,False,True)
         for enemy, bullets in enemies_hit.iteritems():
-            enemy.TakeDamage(20)
+            enemy.TakeDamage(10)
             for b in bullets:
                 enemy.playanim("hit",(b.rect.x,b.rect.y))
             self.score += 50
@@ -102,6 +105,8 @@ class Play(GameState):
                     if (self.trainingMode):
                         self.brain.learn()
                         utils.trainedBrain = self.brain
+                        if (netmodel == 1):
+                            self.brain.train()  # Train the tensorflow version
                     return Menu()
                         
         if self.trainingMode:
@@ -123,7 +128,7 @@ class GameOver(GameState):
         self.score = score
         self.name = ""
         gameover.pressed = ""
-    def update(self,screen,event_queue,dt,clock, joystick):
+    def update(self,screen,event_queue,dt,clock, joystick, netmodel):
         nextState = self        
         self.name = gameover.enter_text(event_queue,screen, 8)
         for event in event_queue:
@@ -140,7 +145,7 @@ class Leaderboard(GameState):
         self.highscores = leaderboard.GetScores()
         #print "init gameover state"
         
-    def update(self,screen,event_queue,dt,clock,joystick):
+    def update(self,screen,event_queue,dt,clock,joystick, netmodel):
         nextState = self
         #print "in gameover state"
         #print self.highscores
@@ -165,7 +170,7 @@ class Menu(GameState):
         self.intel = pygame.transform.smoothscale(self.intel,(self.intel.get_width()/2,self.intel.get_height()/2))
         self.activestate = pygame.transform.smoothscale(self.activestate,(self.activestate.get_width()/2,self.activestate.get_height()/2))
         
-    def update(self, screen, event_queue, dt,clock,joystick):
+    def update(self, screen, event_queue, dt,clock,joystick, netmodel):
         # Logos/titles
         screen.blit(self.logo,(screen.get_width() / 4 - 265,screen.get_height() * 3 / 4-500))
         screen.blit(self.intel,(screen.get_width() / 4 - 300,screen.get_height()-130))

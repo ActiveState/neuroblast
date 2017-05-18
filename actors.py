@@ -5,7 +5,18 @@ from utils import *
 from random import randrange
 import numpy as np
 
+#EnemyHit.wav
+#EnemyShoot.wav
+#HeroLaser.wav
+#Respawn.wav
+#ShipExplode.wav
 
+pygame.mixer.init()
+shootsfx = pygame.mixer.Sound('HeroLaser.wav')
+hitsfx = pygame.mixer.Sound('EnemyHit.wav')
+enemyshootsfx = pygame.mixer.Sound('EnemyShoot.wav')
+explodesfx = pygame.mixer.Sound('ShipExplode.wav')
+respawnsfx = pygame.mixer.Sound('Respawn.wav')
 
 # Global Init stuff should have a proper home once not placeholder art
 #spritesheet = pygame.image.load("spaceship_sprite_package_by_kryptid.png")
@@ -186,11 +197,13 @@ class Enemy(Killable):
     def playanim(self,name,offset):
         if self.anim != self.blowAnim and name=="hit":
             #print "HIT ANIM"
+            hitsfx.play()
             self.anim = self.hitAnim
             self.animoffset = (offset[0]-self.x,offset[1]-self.y)
             self.anim.play()
         if self.anim != self.blowAnim and name=="blow":
             #print "BLOW ANIM"
+            explodesfx.play()
             self.anim = self.blowAnim            
             self.animoffset = (offset[0]-self.x,offset[1]-self.y)
             self.anim.play()
@@ -227,7 +240,7 @@ class Enemy(Killable):
         if self.canfire:
              if (trainingMode and randrange(0,100)<10) or ((netmodel == 1 and not trainingMode and self.brain.keras.predict(np.array([list((dx,dy,du,dv))]))>=0.5) or (netmodel == 0 and not trainingMode and self.brain.model.think([dx,dy,du,dv])>=0.5)):
 #            if (trainingMode and randrange(0,100)<10) or (not trainingMode and self.brain.model.think([dx,dy,du,dv])>=0.5):
-
+                #enemyshootsfx.play()
                 # Cheat to do parallel visualization, sort of performance intensive
                 if (not trainingMode and netmodel == 1):
                     self.brain.model.think([dx,dy,du,dv])
@@ -267,6 +280,7 @@ class Player(Killable):
     def onAnimComplete(self,name):
         if name == "blow":
             #print "BLOW ANIM COMPLETE, DYING"
+            respawnsfx.play()
             if self.lives<0:
                 self.Die()
  
@@ -278,11 +292,13 @@ class Player(Killable):
     def playanim(self,name,offset):
         if self.anim != self.blowAnim and name=="hit":
             #print "HIT ANIM"
+            hitsfx.play()
             self.anim = self.hitAnim
             self.animoffset = (offset[0]-self.x,offset[1]-self.y)
             self.anim.play()
         if self.anim != self.blowAnim and name=="blow":
             #print "BLOW ANIM"
+            explodesfx.play()
             self.anim = self.blowAnim            
             self.animoffset = (offset[0]-self.x,offset[1]-self.y)
             self.anim.play()
@@ -331,6 +347,7 @@ class Player(Killable):
         if self.canfire and (keys[pygame.K_SPACE] or (joystick and joystick.get_button(11))):
             bul = Bullet(self.x,self.y-42,BLUE,(0,-1),320,self.bullets)
             self.canfire = False
+            shootsfx.play()
 
         self.velx = min(self.velx, self.health*2)
         self.velx = max(self.velx, -self.health*2)

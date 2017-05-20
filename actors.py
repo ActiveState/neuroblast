@@ -148,6 +148,9 @@ class Killable(pygame.sprite.Sprite):
                 # Trigger Particle or something
                 self.blinking = True
                 self.blinks = 0
+                self.health = 100 
+
+
     def Die(self):
         self.kill()
 
@@ -325,7 +328,6 @@ class Player(Killable):
                 self.blinks +=1
                 if (self.blinks == self.blinkcycles):
                     self.blinking = False
-                    self.health = 100 
 
         if not(self.canfire):
             self.bulcount += dt

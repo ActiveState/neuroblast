@@ -1,3 +1,25 @@
+'''The MIT License (MIT)
+
+Copyright (c) 2017 ActiveState Software Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.'''
+
 from __future__ import division
 import pygame
 import math
@@ -5,22 +27,16 @@ from utils import *
 from random import randrange
 import numpy as np
 
-#EnemyHit.wav
-#EnemyShoot.wav
-#HeroLaser.wav
-#Respawn.wav
-#ShipExplode.wav
-
 pygame.mixer.init()
-shootsfx = pygame.mixer.Sound('HeroLaser.wav')
-hitsfx = pygame.mixer.Sound('EnemyHit.wav')
-enemyshootsfx = pygame.mixer.Sound('EnemyShoot.wav')
-explodesfx = pygame.mixer.Sound('ShipExplode.wav')
-respawnsfx = pygame.mixer.Sound('Respawn.wav')
+shootsfx = pygame.mixer.Sound('audio/HeroLaser.wav')
+hitsfx = pygame.mixer.Sound('audio/EnemyHit.wav')
+enemyshootsfx = pygame.mixer.Sound('audio/EnemyShoot.wav')
+explodesfx = pygame.mixer.Sound('audio/ShipExplode.wav')
+respawnsfx = pygame.mixer.Sound('audio/Respawn.wav')
 
 # Global Init stuff should have a proper home once not placeholder art
 #spritesheet = pygame.image.load("spaceship_sprite_package_by_kryptid.png")
-spritesheet = pygame.image.load("python-sprites.png")
+spritesheet = pygame.image.load("art/python-sprites.png")
 #spritesheet.set_colorkey(spritesheet.get_at((0, 0)))
 
 class SpriteSequence(object):
@@ -87,18 +103,6 @@ class Bullet(pygame.sprite.Sprite):
         ssrect = pygame.Rect((basex,710,16,16))
         global spritesheet
         self.image.blit(spritesheet,(0,0),ssrect)
-        #self.image.convert()
-        #self.image.set_colorkey(self.image.get_at((0, 0)))
-
-
-#        self.image = pygame.Surface((10, 10), pygame.SRCALPHA, 32)
-#        self.image = self.image.convert_alpha()
-#        self.col = list(color)
-#        for i in range(5, 0, -1):
-#            self.col[0] = color[0] * float(i) / 5
-#            self.col[1] = color[1] * float(i) / 5
-#            self.col[2] = color[2] * float(i) / 5
-#            pygame.draw.circle(self.image, tuple(self.col), (5, 5), i                              0)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.direction = direction
@@ -148,6 +152,7 @@ class Killable(pygame.sprite.Sprite):
                 # Trigger Particle or something
                 self.blinking = True
                 self.blinks = 0
+                self.health = 100 
     def Die(self):
         self.kill()
 
@@ -184,25 +189,19 @@ class Enemy(Killable):
 
     def onAnimComplete(self,name):
         if name == "blow":
-            #print "BLOW ANIM COMPLETE, DYING"
             self.Die()
  
     def amdead(self):
-        #print self
-        #print "ENEMY POS: "+str(self.x)+","+str(self.y)
-        #print "OFFSET" + str(self.animoffset)
         self.playanim("blow",(self.x-48,self.y-24))
  
       
     def playanim(self,name,offset):
         if self.anim != self.blowAnim and name=="hit":
-            #print "HIT ANIM"
             hitsfx.play()
             self.anim = self.hitAnim
             self.animoffset = (offset[0]-self.x,offset[1]-self.y)
             self.anim.play()
         if self.anim != self.blowAnim and name=="blow":
-            #print "BLOW ANIM"
             explodesfx.play()
             self.anim = self.blowAnim            
             self.animoffset = (offset[0]-self.x,offset[1]-self.y)
@@ -234,9 +233,6 @@ class Enemy(Killable):
         du = (self.velx - player_velx) / 60
         dv = (self.vely - player_vely) / 60
 
-        # x is param that is the player's x position
-        #if math.fabs(self.x-player_x) < 5 and self.canfire:
-
         if self.canfire:
              if (trainingMode and randrange(0,100)<10) or ((netmodel == 1 and not trainingMode and self.brain.keras.predict(np.array([list((dx,dy,du,dv))]))>=0.5) or (netmodel == 0 and not trainingMode and self.brain.model.think([dx,dy,du,dv])>=0.5)):
 #            if (trainingMode and randrange(0,100)<10) or (not trainingMode and self.brain.model.think([dx,dy,du,dv])>=0.5):
@@ -252,8 +248,6 @@ class Enemy(Killable):
 class Player(Killable):
     def __init__(self,bulletgroup):
         super(Player, self).__init__()
-        # Player specifc init stuff here
-        # This is a dirty hack
         global spritesheet
         spritesheet.convert_alpha()
         self.cooldown = 0.5
@@ -279,25 +273,21 @@ class Player(Killable):
 
     def onAnimComplete(self,name):
         if name == "blow":
-            #print "BLOW ANIM COMPLETE, DYING"
             respawnsfx.play()
             if self.lives<0:
                 self.Die()
  
     
     def amdead(self):
-        #print str(self.x)+","+str(self.y)
         self.playanim("blow",(self.x-48,self.y-48))
     
     def playanim(self,name,offset):
         if self.anim != self.blowAnim and name=="hit":
-            #print "HIT ANIM"
             hitsfx.play()
             self.anim = self.hitAnim
             self.animoffset = (offset[0]-self.x,offset[1]-self.y)
             self.anim.play()
         if self.anim != self.blowAnim and name=="blow":
-            #print "BLOW ANIM"
             explodesfx.play()
             self.anim = self.blowAnim            
             self.animoffset = (offset[0]-self.x,offset[1]-self.y)
@@ -316,13 +306,11 @@ class Player(Killable):
             self.blinkcount += dt
 
             if self.blinkcount >= self.blinktime:
-                #print "TOGGLE BLINK"
                 self.blinkon =  not self.blinkon
                 self.blinkcount = 0
                 self.blinks +=1
                 if (self.blinks == self.blinkcycles):
                     self.blinking = False
-                    self.health = 100 
 
         if not(self.canfire):
             self.bulcount += dt
@@ -333,16 +321,12 @@ class Player(Killable):
         keys=pygame.key.get_pressed()
 
         if keys[pygame.K_LEFT] or (joystick and (joystick.get_axis(0)<-DEADZONE or joystick.get_button(2))):
-            #print "left"
             self.velx = -SHIP_ACC
         if keys[pygame.K_RIGHT] or (joystick and (joystick.get_axis(0)>DEADZONE or joystick.get_button(3))):
-            #print "right"
             self.velx = SHIP_ACC
         if keys[pygame.K_UP] or (joystick and (joystick.get_axis(1)<-DEADZONE or joystick.get_button(0))):
-            #print "up"
             self.vely = -SHIP_ACC
         if keys[pygame.K_DOWN] or (joystick and (joystick.get_axis(1)>DEADZONE or joystick.get_button(1))):
-            #print "down"
             self.vely = SHIP_ACC
         if self.canfire and (keys[pygame.K_SPACE] or (joystick and joystick.get_button(11))):
             bul = Bullet(self.x,self.y-42,BLUE,(0,-1),320,self.bullets)
@@ -355,10 +339,8 @@ class Player(Killable):
         self.vely = max(self.vely, -self.health)
 
         if not (keys[pygame.K_UP] or keys[pygame.K_DOWN] or (joystick and (math.fabs(joystick.get_axis(1))>DEADZONE or joystick.get_button(0) or joystick.get_button(1)))):
-            #print "dfsdfsdfs"
             self.vely = 0
         if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT] or (joystick and (math.fabs(joystick.get_axis(0))>DEADZONE or joystick.get_button(2) or joystick.get_button(3)))):
-            #print "aaaoieuroiuo"
             self.velx = 0
             
         if self.x+(self.velx*dt)>640-48 or self.x+(self.velx*dt)<48:

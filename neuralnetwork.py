@@ -1,3 +1,27 @@
+'''The MIT License (MIT)
+
+Copyright (c) 2017 ActiveState Software Inc.
+Copyright (c) 2015 Milo Spencer-Harper
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.'''
+
+
 import pygame
 from math import fabs
 from formulae import sigmoid, sigmoid_derivative, random_weight, get_synapse_colour, adjust_line_to_perimeter_of_circle, layer_left_margin
@@ -10,7 +34,6 @@ class Synapse():
         self.input_neuron_index = input_neuron_index
         self.weight = random_weight()
         self.signal = 0
-        #x1, x2, y1, y2 = adjust_line_to_perimeter_of_circle(x1, x2, y1, y2)
         self.x1 = x1
         self.x2 = x2
         self.y1 = y1
@@ -19,13 +42,7 @@ class Synapse():
     def draw(self,screen):
         lo = parameters.left_offset
         to = parameters.top_offset
-        #print "Drawing synapse"
-        #line(Surface, color, start_pos, end_pos, width=1)
         pygame.draw.line(screen,get_synapse_colour(self.weight),(self.x1+lo, self.y1+to), (self.x2+lo, self.y2+to),max(1,int(fabs(self.weight))))
-        #line = pyplot.Line2D((self.x1, self.x2), (self.y1, self.y2), lw=fabs(self.weight), color=get_synapse_colour(self.weight), zorder=1)
-        #outer_glow = pyplot.Line2D((self.x1, self.x2), (self.y1, self.y2), lw=(fabs(self.weight) * 2), color=get_synapse_colour(self.weight), zorder=2, alpha=self.signal * 0.4)
-        #ax.add_line(line)
-        #ax.add_line(outer_glow)
 
 
 class Neuron():
@@ -61,17 +78,9 @@ class Neuron():
         for synapse in self.synapses:
             synapse.draw(screen)
         
-        #circle(Surface, color, pos, radius, width=0)
         lo = parameters.left_offset
         to = parameters.top_offset
         pygame.draw.circle(nsurf,(180,180,200),(self.x+lo, self.y+to),parameters.neuron_radius)
-        #circle = pyplot.Circle((self.x, self.y), radius=parameters.neuron_radius, fill=True, color=(0.2, 0.2, 0), zorder=3)
-        #print self.output
-        #outer_glow = pyplot.Circle((self.x, self.y), radius=parameters.neuron_radius * 1.5, fill=True, color=(0.5, 0.5, 0), zorder=4, alpha=0.5)
-        #pygame.draw.circle(screen,(120,120,220,int(self.output*255)),(self.x+lo, self.y+to),int(parameters.neuron_radius*1.5))
-        #ax.add_patch(circle)
-        #ax.add_patch(outer_glow)
-        #pyplot.text(self.x + 0.8, self.y, round(self.output, 2))
         displaytext(str(round(self.output, 2)), 16, self.x + 2+lo, self.y+to, BLACK, nsurf)
 
 

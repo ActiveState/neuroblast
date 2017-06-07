@@ -1,3 +1,25 @@
+'''The MIT License (MIT)
+
+Copyright (c) 2017 ActiveState Software Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.'''
+
 # game.py
 # Eventually will hold all the core game functions, game loop etc.
 # But none of the other stuff
@@ -12,7 +34,6 @@ import math
 import numpy as np
 import gamestates
 from utils import *
-import plot
 import sys
 
 ### GLOBAL GAME INIT AND MAIN LOOP
@@ -24,7 +45,6 @@ loadfont(24)
 netmodel = 0
 # Configure screen TODO: Should there be a config object or something to contain this?
 resolution = (1280, 720)
-#flags = pygame.FULLSCREEN | pygame.DOUBLEBUF
 flags = pygame.DOUBLEBUF
 if (len(sys.argv) > 1) and (sys.argv[1] == '-f'):
     flags |= pygame.FULLSCREEN
@@ -37,7 +57,7 @@ screen.set_alpha(None)
 
 pygame.display.set_caption("Neuro/Blast")
 
-background = pygame.image.load('python-game_background.png')
+background = pygame.image.load('art/python-game_background.png')
 bgsize = background.get_size()
 w, h = bgsize
 
@@ -69,7 +89,6 @@ init_stars(screen)
 state = gamestates.Menu()
 
 scrollSpeed = -1
-#y = -hscale+720
 
 # Optimized method for scrolling background continuously
 topY = hscale-720       # As soon as topY because -720, next frame, flip it back to hscale-720
@@ -77,21 +96,13 @@ topY = hscale-720       # As soon as topY because -720, next frame, flip it back
 plotUpdateRate = 1/10.0
 plotCounter = 0.0
 
-# -------- Main Program Loop -----------
 while not done:
-    # --- Main event loop
     event_queue = pygame.event.get()
     for event in event_queue:
         if event.type == pygame.QUIT:
             done = True
-        #if event.type == pygame.KEYDOWN:
-            #if event.key == pygame.K_ESCAPE:
-                #done = True
 
-    # --- Game logic should go here
     topY += scrollSpeed
-    # --- Screen-clearing code goes here
-    #screen.blit(bgscaled, (0, y))
     offset = hscale+topY    # If topY becomes negative, we use this to seamlessly blit until it clears itself up
     y = topY
     blitStartY = 0
@@ -105,7 +116,6 @@ while not done:
     
     if topY<=-720:
         topY = hscale-720     
-    # --- Drawing code should go here
     move_and_draw_stars(screen)
     ## Gamestate update
     state = state.update(screen, event_queue, clock.get_time()/1000.0, clock, joystick, netmodel)
@@ -113,15 +123,7 @@ while not done:
     if state == None:
         done = True
         
-#    plotCounter+= clock.get_time()/1000.0
-#    if plotCounter>plotUpdateRate:
-        # Get the plotted data and display it on screen
-#        surf = plot.plot(np.random.random((640, 360)))
-#        screen.blit(surf,(640,0))
-#        plotCounter = 0.0
-    # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
-    # --- Limit to 60 frames per second
     clock.tick(30)
 
 # Close the window and quit.

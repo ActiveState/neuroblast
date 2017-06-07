@@ -1,3 +1,25 @@
+'''The MIT License (MIT)
+
+Copyright (c) 2017 ActiveState Software Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.'''
+
 import pygame
 from pygame.locals import *
 import sys
@@ -7,21 +29,11 @@ from utils import *
 pressed = ""
 
 def enter_text(eq, screen, max_length, lower = False, upper = False, title = False):
-    """
-    returns user name input of max length "max length and with optional
-    string operation performed
-    """
-
-    #print "listening for input"
-    
     global pressed
     BLUE = (0,0,255)
-    # create list of allowed characters using ascii values
-    # numbers 1-9, letters a-z
     allowed_values = [i for i in range(97, 123)] +\
                      [i for i in range(48,58)]
 
-    # create blinking underscore
     BLINK_EVENT = pygame.USEREVENT + 0
     pygame.time.set_timer(BLINK_EVENT, 800)
     blinky = cycle(["_", " "])

@@ -1,4 +1,4 @@
-'''The MIT License (MIT)
+The MIT License (MIT)
 
 Copyright (c) 2017 ActiveState Software Inc.
 Copyright (c) 2015 Milo Spencer-Harper
@@ -19,21 +19,4 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
-
-# Parameters for drawing the network
-vertical_distance_between_layers = 120
-horizontal_distance_between_neurons = 110
-neuron_radius = 40
-number_of_neurons_in_widest_layer = 4
-width = 25
-height = 20
-left_margin = 10
-bottom_margin = 2
-error_bar_x_position = 14
-output_y_position = 15
-top_offset = 180
-left_offset = 145
-
-# Parameters for training the network
-training_iterations = 60000
+SOFTWARE.

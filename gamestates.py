@@ -1,3 +1,25 @@
+'''The MIT License (MIT)
+
+Copyright (c) 2017 ActiveState Software Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.'''
+
 import pygame
 import utils
 from utils import *
@@ -17,10 +39,8 @@ class Play(GameState):
     def __init__(self, trainingMode):
         if utils.trainedBrain:
             self.brain = utils.trainedBrain
-            print "ADDING A TRAINED BRAIN "+str(self.brain.id)
         else:
             self.brain = Brain()
-            print "CREATING A NEW BRAIN "+str(self.brain.id)
         self.enemyspeed = 16
         self.enemyBullets = pygame.sprite.Group()
         self.userBullets = pygame.sprite.Group()
@@ -76,7 +96,6 @@ class Play(GameState):
         for enemy in self.enemies:
             if enemy.anim:
                 if enemy.anim.playing:
-                    #print enemy.animoffset
                     enemy.anim.update(screen,(enemy.x+enemy.animoffset[0],enemy.y+enemy.animoffset[1]),dt)
                 else:
                     enemy.anim = None
@@ -124,7 +143,6 @@ class Play(GameState):
 
 class GameOver(GameState):
     def __init__(self,score):
-        print "Creating gameover state with score "+str(score)
         self.score = score
         self.name = ""
         gameover.pressed = ""
@@ -143,12 +161,9 @@ class Leaderboard(GameState):
     def __init__(self,name):
         self.name = name
         self.highscores = leaderboard.GetScores()
-        #print "init gameover state"
         
     def update(self,screen,event_queue,dt,clock,joystick, netmodel):
         nextState = self
-        #print "in gameover state"
-        #print self.highscores
         leaderboard.DisplayLeaderBoard(screen,self.highscores,self.name)
         for event in event_queue:
             if event.type == pygame.KEYDOWN:
@@ -164,9 +179,9 @@ class Leaderboard(GameState):
 class Menu(GameState):
     def __init__(self):
         self.menu_selection = 2
-        self.logo = pygame.image.load("neuro-blast_logo.png")
-        self.intel = pygame.image.load("Intel-logo_blue.png")
-        self.activestate = pygame.image.load("as-logo.png")
+        self.logo = pygame.image.load("art/neuro-blast_logo.png")
+        self.intel = pygame.image.load("art/Intel-logo_blue.png")
+        self.activestate = pygame.image.load("art/as-logo.png")
         self.intel = pygame.transform.smoothscale(self.intel,(self.intel.get_width()/2,self.intel.get_height()/2))
         self.activestate = pygame.transform.smoothscale(self.activestate,(self.activestate.get_width()/2,self.activestate.get_height()/2))
         
@@ -183,10 +198,6 @@ class Menu(GameState):
                     - 40, WHITE, screen)
         displaytext('Exit', 32, screen.get_width() / 4 - 20, screen.get_height() * 3 / 4,
                     WHITE, screen)
-        #displaytext('Neuro/Blast v1.0', 12, screen.get_width() - 80, screen.get_height() - 20,
- #                   WHITE, screen)
-        #displaytext('Copyright (C) 2017 ActiveState Software Inc.', 12, screen.get_width() - 80, screen.get_height() - 10,
- #                   WHITE, screen)
         displaytext(u'\u00bb', 32, screen.get_width() / 4 - 60, screen.get_height() * 3 / 4
                     - 40*self.menu_selection, WHITE, screen)
 
@@ -205,7 +216,6 @@ class Menu(GameState):
                     if self.menu_selection == 2:
                         nextState = Play(False)
                     elif self.menu_selection == 1:
-                        print "TRAINING MODE"
                         nextState = Play(True)
                     else:
                         nextState = None

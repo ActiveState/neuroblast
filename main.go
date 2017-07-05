@@ -4,6 +4,8 @@ import (
 	"math/rand"
 	"time"
 
+	"math"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
@@ -12,8 +14,13 @@ import (
 
 const playerVel float64 = 100
 const bulletVel float64 = 320
+const showDebug bool = true
 
 func drawRect(imd *imdraw.IMDraw, r pixel.Rect) {
+
+	if !showDebug {
+		return
+	}
 
 	imd.Color = pixel.RGB(1, 0, 0)
 	imd.Push(pixel.V(r.Min.X, r.Min.Y))
@@ -93,11 +100,12 @@ func run() {
 			dir:   +1,
 		},
 
-		cooldown: 0.1,
-		canfire:  true,
-		vel:      pixel.ZV,
-		pos:      pixel.V(320, 600),
-		rect:     pixel.R(0, 0, 96, 184),
+		cooldown:  0.1,
+		canfire:   true,
+		vel:       pixel.ZV,
+		pos:       pixel.V(320, 600),
+		rect:      pixel.R(0, 0, 96, 184),
+		spawnTime: time.Now(),
 	}
 	enemy.idleAnim.play("Idle", true)
 	enemy.rect = enemy.rect.Moved(enemy.pos)
@@ -190,6 +198,19 @@ func run() {
 
 		player.pos = player.pos.Add(ctrl)
 		player.rect = player.rect.Moved(ctrl)
+
+		// UPDATE ENEMIES
+		//self.velx = math.sin((pygame.time.get_ticks()-self.spawntime)/1800) * 40
+		//self.x += self.velx * dt
+		//self.y += self.vely * dt
+		enemyVel := math.Sin(time.Since(enemy.spawnTime).Seconds()*1000/1800) * 40
+
+		enemyVec := pixel.V(enemyVel, -10).Scaled(dt)
+
+		enemy.pos = enemy.pos.Add(enemyVec)
+		enemy.rect = enemy.rect.Moved(enemyVec)
+
+		// END OF ENEMY UPDATES
 
 		// UPDATE BULLETS!!!
 		i := 0

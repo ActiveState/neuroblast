@@ -1,6 +1,7 @@
 package main
 
 import "github.com/faiface/pixel"
+import "time"
 
 type baseActor struct {
 	lives       int
@@ -50,16 +51,17 @@ type bullet struct {
 }
 
 type player struct {
-	hitAnim  *spriteAnim
-	blowAnim *spriteAnim
-	idleAnim *spriteAnim
-	cooldown float64
-	canfire  bool
-	bulcount float64
-	pos      pixel.Vec
-	vel      pixel.Vec
-	rect     pixel.Rect
-	hitSpot  pixel.Rect
+	hitAnim   *spriteAnim
+	blowAnim  *spriteAnim
+	idleAnim  *spriteAnim
+	cooldown  float64
+	canfire   bool
+	bulcount  float64
+	pos       pixel.Vec
+	vel       pixel.Vec
+	rect      pixel.Rect
+	hitSpot   pixel.Rect
+	spawnTime time.Time
 	// Function callbacks??? Channels?
 
 }

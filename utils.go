@@ -18,9 +18,13 @@ type spriteAnim struct {
 	anims map[string][]pixel.Rect
 	rate  float64
 
-	//state   animState
 	counter float64
 	dir     float64
+
+	currentAnim  string
+	currentFrame int
+	loop         bool
+	playing      bool
 
 	frame pixel.Rect
 
@@ -100,55 +104,33 @@ func loadAnimationSheet(sheetPath, descPath string, frameWidth float64) (sheet p
 	return sheet, anims, nil
 }
 
+func (ga *spriteAnim) play(anim string, loop bool) {
+	ga.currentAnim = anim
+	ga.counter = 0
+	ga.currentFrame = 0
+	ga.loop = loop
+	ga.playing = true
+}
+
 func (ga *spriteAnim) update(dt float64, phys *player) {
 	ga.counter += dt
-	ga.frame = ga.anims["Idle"][0]
 
-	/*	// determine the new animation state
-		var newState animState
-		switch {
-		case !phys.ground:
-			newState = jumping
-		case phys.vel.Len() == 0:
-			newState = idle
-		case phys.vel.Len() > 0:
-			newState = running
-		}
-
-	*/ // reset the time counter if the state changed
-	/*	if ga.state != newState {
-			ga.state = newState
-			ga.counter = 0
-		}
-	*/
-	// determine the correct animation frame
-	/*	switch ga.state {
-		case idle:
-			ga.frame = ga.anims["Front"][0]
-		case running:
-			i := int(math.Floor(ga.counter / ga.rate))
-			ga.frame = ga.anims["Run"][i%len(ga.anims["Run"])]
-		case jumping:
-			speed := phys.vel.Y
-			i := int((-speed/phys.jumpSpeed + 1) / 2 * float64(len(ga.anims["Jump"])))
-			if i < 0 {
-				i = 0
+	if ga.counter >= ga.rate {
+		ga.currentFrame++
+		ga.counter = 0
+		if ga.loop {
+			if ga.currentFrame >= len(ga.anims[ga.currentAnim]) {
+				ga.currentFrame = 0
 			}
-			if i >= len(ga.anims["Jump"]) {
-				i = len(ga.anims["Jump"]) - 1
-			}
-			ga.frame = ga.anims["Jump"][i]
-		}
-
-		// set the facing direction of the gopher
-		if phys.vel.X != 0 {
-			if phys.vel.X > 0 {
-				ga.dir = +1
-			} else {
-				ga.dir = -1
+		} else {
+			if ga.currentFrame >= len(ga.anims[ga.currentAnim]) {
+				ga.currentFrame = len(ga.anims[ga.currentAnim]) - 1
+				ga.playing = false
 			}
 		}
-	*/
+	}
+
+	ga.frame = ga.anims[ga.currentAnim][ga.currentFrame]
 }
 
 func (ga *spriteAnim) draw(t pixel.Target, phys *player) {

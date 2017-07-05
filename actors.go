@@ -42,6 +42,12 @@ func (b *baseActor) TakeDamage(dmg int) {
 	rect:      pixel.R(-6, -7, 6, 7),
 }*/
 
+type bullet struct {
+	pos    pixel.Vec
+	vel    pixel.Vec
+	sprite *pixel.Sprite
+}
+
 type player struct {
 	hitAnim  *spriteAnim
 	blowAnim *spriteAnim
@@ -51,8 +57,6 @@ type player struct {
 	bulcount float64
 	pos      pixel.Vec
 	vel      pixel.Vec
-	velx     int
-	vely     int
 	rect     pixel.Rect
 	// Function callbacks??? Channels?
 

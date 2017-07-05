@@ -180,14 +180,16 @@ func run() {
 			player.bulcount = 0
 		}
 
+		if canvas.Bounds().Intersect(player.rect.Moved(ctrl)).Area() < player.rect.Area() {
+			ctrl = pixel.ZV
+		}
+
+		if player.rect.Moved(ctrl).Intersect(enemy.rect).Area() > 0 {
+			ctrl = pixel.ZV
+		}
+
 		player.pos = player.pos.Add(ctrl)
 		player.rect = player.rect.Moved(ctrl)
-		//fmt.Println(player.pos)
-		// update the physics and animation
-		/*		phys.update(dt, ctrl, platforms)
-				gol.update(dt)
-				anim.update(dt, phys)
-		*/
 
 		// UPDATE BULLETS!!!
 		i := 0

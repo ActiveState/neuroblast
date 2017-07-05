@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"golang.org/x/image/colornames"
 )
@@ -12,8 +13,21 @@ import (
 const playerVel float64 = 100
 const bulletVel float64 = 320
 
+func drawRect(imd *imdraw.IMDraw, r pixel.Rect) {
+
+	imd.Color = pixel.RGB(1, 0, 0)
+	imd.Push(pixel.V(r.Min.X, r.Min.Y))
+	imd.Push(pixel.V(r.Min.X, r.Max.Y))
+	imd.Push(pixel.V(r.Max.X, r.Max.Y))
+	imd.Push(pixel.V(r.Max.X, r.Min.Y))
+	imd.Push(pixel.V(r.Min.X, r.Min.Y))
+	imd.Rectangle(1)
+}
+
 func run() {
 	rand.Seed(time.Now().UnixNano())
+
+	imd := imdraw.New(nil)
 
 	// Load Bullet sprites
 	bulletpic, err := loadPicture("art/bullet.png")
@@ -39,7 +53,7 @@ func run() {
 		panic(err)
 	}
 
-	//enemysheet, enemyanims, err := loadAnimationSheet("art/enemy.png", "enemysheet.csv", 96)
+	enemysheet, enemyanims, err := loadAnimationSheet("art/enemy.png", "enemysheet.csv", 96)
 
 	hitsheet, hitanims, err := loadAnimationSheet("art/bullethit.png", "bulletsheet.csv", 96)
 	explodesheet, explodeanims, err := loadAnimationSheet("art/explosion.png", "explodesheet.csv", 96)
@@ -58,6 +72,35 @@ func run() {
 	// that is scrolling
 	background := pixel.NewSprite(bg, bg.Bounds())
 	bgslice := pixel.NewSprite(bg, pixel.R(0, 0, 0, 0))
+
+	enemy := &player{
+		idleAnim: &spriteAnim{
+			sheet: enemysheet,
+			anims: enemyanims,
+			rate:  1.0 / 10,
+			dir:   +1,
+		},
+		hitAnim: &spriteAnim{
+			sheet: hitsheet,
+			anims: hitanims,
+			rate:  1.0 / 10,
+			dir:   +1,
+		},
+		blowAnim: &spriteAnim{
+			sheet: explodesheet,
+			anims: explodeanims,
+			rate:  1.0 / 10,
+			dir:   +1,
+		},
+
+		cooldown: 0.1,
+		canfire:  true,
+		vel:      pixel.ZV,
+		pos:      pixel.V(320, 600),
+		rect:     pixel.R(0, 0, 96, 184),
+	}
+	enemy.idleAnim.play("Idle", true)
+	enemy.rect = enemy.rect.Moved(enemy.pos)
 
 	player := &player{
 		idleAnim: &spriteAnim{
@@ -82,10 +125,11 @@ func run() {
 		cooldown: 0.1,
 		canfire:  true,
 		vel:      pixel.ZV,
-		pos:      pixel.V(320, 360),
-		rect:     pixel.R(-48, -50, 48, 50),
+		pos:      pixel.V(320, 100),
+		rect:     pixel.R(0, 0, 96, 100),
 	}
 	player.idleAnim.play("Idle", true)
+	player.rect = player.rect.Moved(player.pos)
 
 	canvas := pixelgl.NewCanvas(pixel.R(0, 0, 640, 720))
 
@@ -125,9 +169,11 @@ func run() {
 
 			bullet := &bullet{
 				sprite: pixel.NewSprite(bulletpic, bulletpic.Bounds()),
-				pos:    player.pos.Add(pixel.V(0, 48)),
+				pos:    player.pos.Add(pixel.V(40, 96)),
 				vel:    pixel.V(0, bulletVel),
+				rect:   pixel.R(0, 0, 16, 16),
 			}
+			bullet.rect = bullet.rect.Moved(bullet.pos)
 
 			bullets = append(bullets, bullet)
 			player.canfire = false
@@ -135,6 +181,7 @@ func run() {
 		}
 
 		player.pos = player.pos.Add(ctrl)
+		player.rect = player.rect.Moved(ctrl)
 		//fmt.Println(player.pos)
 		// update the physics and animation
 		/*		phys.update(dt, ctrl, platforms)
@@ -147,9 +194,18 @@ func run() {
 		for _, b := range bullets {
 			// Add bullet movement
 			b.pos = b.pos.Add(b.vel.Scaled(dt))
+			b.rect = b.rect.Moved(b.vel.Scaled(dt))
+
+			if b.rect.Intersect(enemy.rect).Area() > 0 {
+				//fmt.Println("HIT")
+				enemy.hitSpot = pixel.R(0, 0, 96, 100)
+				enemy.hitSpot = enemy.hitSpot.Moved(b.rect.Center().Sub(pixel.V(48, 50)))
+				enemy.hitAnim.play("Hit", false)
+				b = nil
+			}
 
 			// Only keep on-screen bullets
-			if b.pos.Y < 720 {
+			if b != nil && b.pos.Y < 720 {
 				bullets[i] = b
 				i++
 			}
@@ -185,24 +241,39 @@ func run() {
 
 		// Physics and animation updates
 		player.idleAnim.update(dt, player)
+		enemy.idleAnim.update(dt, enemy)
+		enemy.hitAnim.update(dt, enemy)
+		enemy.blowAnim.update(dt, enemy)
+		player.hitAnim.update(dt, player)
+		player.blowAnim.update(dt, player)
 		// draw the scene to the canvas
 		canvas.Clear(colornames.Black)
 		bgslice.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360+(blitStartY/2)))))
 		background.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360-(offset/2)))))
-		player.idleAnim.draw(canvas, player)
+		if player.idleAnim.playing {
+			player.idleAnim.draw(canvas, player.rect)
+		}
+		if enemy.idleAnim.playing {
+			enemy.idleAnim.draw(canvas, enemy.rect)
+		}
+
+		if enemy.hitAnim.playing {
+			enemy.hitAnim.draw(canvas, enemy.hitSpot)
+		}
 
 		for _, b := range bullets {
-			b.sprite.Draw(canvas, pixel.IM.Moved(b.pos))
+			b.sprite.Draw(canvas, pixel.IM.Moved(b.rect.Center()))
+			drawRect(imd, b.rect)
 		}
+
+		drawRect(imd, player.rect)
+		drawRect(imd, enemy.rect)
+
+		imd.Draw(canvas)
+		imd.Clear()
 
 		// stretch the canvas to the window
 		win.Clear(colornames.White)
-		//win.SetMatrix(pixel.IM.Scaled(pixel.ZV,
-		//	math.Min(
-		//		win.Bounds().W()/canvas.Bounds().W(),
-		//			win.Bounds().H()/canvas.Bounds().H(),
-		//			),
-		//		).Moved(win.Bounds().Center()))
 		canvas.Draw(win, pixel.IM.Moved(pixel.V(320, 360)))
 		win.Update()
 	}

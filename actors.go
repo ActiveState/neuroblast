@@ -45,6 +45,7 @@ func (b *baseActor) TakeDamage(dmg int) {
 type bullet struct {
 	pos    pixel.Vec
 	vel    pixel.Vec
+	rect   pixel.Rect
 	sprite *pixel.Sprite
 }
 
@@ -58,6 +59,7 @@ type player struct {
 	pos      pixel.Vec
 	vel      pixel.Vec
 	rect     pixel.Rect
+	hitSpot  pixel.Rect
 	// Function callbacks??? Channels?
 
 }

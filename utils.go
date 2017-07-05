@@ -113,6 +113,10 @@ func (ga *spriteAnim) play(anim string, loop bool) {
 }
 
 func (ga *spriteAnim) update(dt float64, phys *player) {
+	if !ga.playing {
+		return
+	}
+
 	ga.counter += dt
 
 	if ga.counter >= ga.rate {
@@ -133,7 +137,7 @@ func (ga *spriteAnim) update(dt float64, phys *player) {
 	ga.frame = ga.anims[ga.currentAnim][ga.currentFrame]
 }
 
-func (ga *spriteAnim) draw(t pixel.Target, phys *player) {
+func (ga *spriteAnim) draw(t pixel.Target, rect pixel.Rect) {
 	if ga.sprite == nil {
 		ga.sprite = pixel.NewSprite(nil, pixel.Rect{})
 	}
@@ -141,10 +145,10 @@ func (ga *spriteAnim) draw(t pixel.Target, phys *player) {
 	ga.sprite.Set(ga.sheet, ga.frame)
 	ga.sprite.Draw(t, pixel.IM.
 		ScaledXY(pixel.ZV, pixel.V(
-			phys.rect.W()/ga.sprite.Frame().W(),
-			phys.rect.H()/ga.sprite.Frame().H(),
+			rect.W()/ga.sprite.Frame().W(),
+			rect.H()/ga.sprite.Frame().H(),
 		)).
-		ScaledXY(pixel.ZV, pixel.V(-ga.dir, 1)).
-		Moved(phys.rect.Center().Add(phys.pos)),
+		//ScaledXY(pixel.ZV, pixel.V(-ga.dir, 1)).
+		Moved(rect.Center()),
 	)
 }

@@ -50,7 +50,7 @@ func run() {
 		},
 
 		vel:  pixel.ZV,
-		pos:  pixel.ZV,
+		pos:  pixel.V(320, 360),
 		rect: pixel.R(-48, -50, 48, 50),
 	}
 
@@ -90,15 +90,16 @@ func run() {
 		// control the gopher with keys
 		ctrl := pixel.ZV
 		if win.Pressed(pixelgl.KeyLeft) {
-			fmt.Println("left")
 			ctrl.X = -1
 		}
 		if win.Pressed(pixelgl.KeyRight) {
-			fmt.Println("right")
 			ctrl.X = 1
 		}
-		if win.JustPressed(pixelgl.KeyUp) {
+		if win.Pressed(pixelgl.KeyUp) {
 			ctrl.Y = 1
+		}
+		if win.Pressed(pixelgl.KeyDown) {
+			ctrl.Y = -1
 		}
 
 		player.pos = player.pos.Add(ctrl)

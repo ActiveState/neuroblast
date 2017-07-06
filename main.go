@@ -1,10 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 
 	"math"
+
+	tf "github.com/tensorflow/tensorflow/tensorflow/go"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
@@ -32,6 +35,36 @@ func drawRect(imd *imdraw.IMDraw, r pixel.Rect) {
 }
 
 func run() {
+	// Tensorflow stuff
+	bundle, err := tf.LoadSavedModel("exported_brain", []string{"train"}, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	inputop := bundle.Graph.Operation("dense_1_input")
+	outputop := bundle.Graph.Operation("dense_5/Sigmoid")
+
+	fmt.Println(inputop.Name())
+	fmt.Println(outputop.Name())
+
+	var column *tf.Tensor
+	if column, err = tf.NewTensor([1][4]float32{{1, 1, 1, 1}}); err != nil {
+		panic(err.Error())
+	}
+
+	results, err := bundle.Session.Run(map[tf.Output]*tf.Tensor{inputop.Output(0): column}, []tf.Output{outputop.Output(0)}, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, result := range results {
+		fmt.Println(result.Value().([][]float32))
+
+		if result.Value().([][]float32)[0][0] > 0.5 {
+			fmt.Println("FIRE!!")
+		}
+	}
+
 	rand.Seed(time.Now().UnixNano())
 
 	imd := imdraw.New(nil)
@@ -197,6 +230,7 @@ func run() {
 
 		player.pos = player.pos.Add(ctrl)
 		player.rect = player.rect.Moved(ctrl)
+		player.vel = ctrl.Scaled(1 / dt)
 
 		// UPDATE ENEMIES
 		//self.velx = math.sin((pygame.time.get_ticks()-self.spawntime)/1800) * 40
@@ -208,20 +242,45 @@ func run() {
 
 		enemy.pos = enemy.pos.Add(enemyVec)
 		enemy.rect = enemy.rect.Moved(enemyVec)
+		enemy.vel = pixel.V(enemyVel, -10)
 
-		// ENemy shooting logic
-		if rand.Intn(100) < 20 {
-			bullet := &bullet{
-				sprite: pixel.NewSprite(enemybulletpic, enemybulletpic.Bounds()),
-				pos:    enemy.pos.Add(pixel.V(40, 0)),
-				vel:    pixel.V(0, -bulletVel),
-				rect:   pixel.R(0, 0, 16, 16),
-			}
-			bullet.rect = bullet.rect.Moved(bullet.pos)
+		var dx, dy, du, dv float32
+		// Normalized values
+		dx = float32((enemy.pos.X - player.pos.X) / 640)
+		dy = -float32((enemy.pos.Y - player.pos.Y) / 720)
+		du = float32((enemy.vel.X - player.vel.X) / 60)
+		dv = -float32((enemy.vel.Y - player.vel.Y) / 60)
 
-			enemybullets = append(enemybullets, bullet)
-
+		// Enemy shooting logic - This is the TensorFlow bit
+		var column *tf.Tensor
+		if column, err = tf.NewTensor([1][4]float32{{dx, dy, du, dv}}); err != nil {
+			panic(err.Error())
 		}
+
+		results, err := bundle.Session.Run(map[tf.Output]*tf.Tensor{inputop.Output(0): column}, []tf.Output{outputop.Output(0)}, nil)
+		if err != nil {
+			panic(err)
+		}
+
+		for _, result := range results {
+			fmt.Printf("Input: dx: %f dy: %f du: %f dv: %f\n", dx, dy, du, dv)
+			fmt.Println(result.Value().([][]float32))
+
+			if result.Value().([][]float32)[0][0] >= 0.5 {
+				bullet := &bullet{
+					sprite: pixel.NewSprite(enemybulletpic, enemybulletpic.Bounds()),
+					pos:    enemy.pos.Add(pixel.V(40, 0)),
+					vel:    pixel.V(0, -bulletVel),
+					rect:   pixel.R(0, 0, 16, 16),
+				}
+				bullet.rect = bullet.rect.Moved(bullet.pos)
+
+				enemybullets = append(enemybullets, bullet)
+			}
+		}
+
+		//if rand.Intn(100) < 20 {
+		//}
 
 		// END OF ENEMY UPDATES
 

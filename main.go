@@ -41,7 +41,7 @@ func run() {
 	if err != nil {
 		panic(err)
 	}
-	//enemybulletpic, err := loadPicture("art/enemybullet.png")
+	enemybulletpic, err := loadPicture("art/enemybullet.png")
 	if err != nil {
 		panic(err)
 	} // Load bg
@@ -50,9 +50,8 @@ func run() {
 		panic(err)
 	}
 
-	//enemybullet := pixel.NewSprite(enemybulletpic, enemybulletpic.Bounds())
-
 	var bullets []*bullet
+	var enemybullets []*bullet
 
 	//sheet, anims, err := loadAnimationSheet("art/python-sprites.png", "sheet.csv", 12)
 	sheet, anims, err := loadAnimationSheet("art/HeroSheet.png", "sheet.csv", 96)
@@ -210,6 +209,20 @@ func run() {
 		enemy.pos = enemy.pos.Add(enemyVec)
 		enemy.rect = enemy.rect.Moved(enemyVec)
 
+		// ENemy shooting logic
+		if rand.Intn(100) < 20 {
+			bullet := &bullet{
+				sprite: pixel.NewSprite(enemybulletpic, enemybulletpic.Bounds()),
+				pos:    enemy.pos.Add(pixel.V(40, 0)),
+				vel:    pixel.V(0, -bulletVel),
+				rect:   pixel.R(0, 0, 16, 16),
+			}
+			bullet.rect = bullet.rect.Moved(bullet.pos)
+
+			enemybullets = append(enemybullets, bullet)
+
+		}
+
 		// END OF ENEMY UPDATES
 
 		// UPDATE BULLETS!!!
@@ -234,6 +247,29 @@ func run() {
 			}
 		}
 		bullets = bullets[:i]
+
+		// UPDATE ENEMY BULLETS!!!
+		i = 0
+		for _, b := range enemybullets {
+			// Add bullet movement
+			b.pos = b.pos.Add(b.vel.Scaled(dt))
+			b.rect = b.rect.Moved(b.vel.Scaled(dt))
+
+			if b.rect.Intersect(player.rect).Area() > 0 {
+				//fmt.Println("HIT")
+				player.hitSpot = pixel.R(0, 0, 96, 100)
+				player.hitSpot = player.hitSpot.Moved(b.rect.Center().Sub(pixel.V(48, 50)))
+				player.hitAnim.play("Hit", false)
+				b = nil
+			}
+
+			// Only keep on-screen bullets
+			if b != nil && b.pos.Y > 0 {
+				enemybullets[i] = b
+				i++
+			}
+		}
+		enemybullets = enemybullets[:i]
 
 		// UPDATE THE BACKGROUND SCROLLING
 		topY += scrollSpeed
@@ -283,8 +319,15 @@ func run() {
 		if enemy.hitAnim.playing {
 			enemy.hitAnim.draw(canvas, enemy.hitSpot)
 		}
+		if player.hitAnim.playing {
+			player.hitAnim.draw(canvas, player.hitSpot)
+		}
 
 		for _, b := range bullets {
+			b.sprite.Draw(canvas, pixel.IM.Moved(b.rect.Center()))
+			drawRect(imd, b.rect)
+		}
+		for _, b := range enemybullets {
 			b.sprite.Draw(canvas, pixel.IM.Moved(b.rect.Center()))
 			drawRect(imd, b.rect)
 		}

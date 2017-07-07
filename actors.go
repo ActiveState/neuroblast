@@ -50,7 +50,7 @@ type bullet struct {
 	sprite *pixel.Sprite
 }
 
-type player struct {
+type actor struct {
 	hitAnim   *spriteAnim
 	blowAnim  *spriteAnim
 	idleAnim  *spriteAnim

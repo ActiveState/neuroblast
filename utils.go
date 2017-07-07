@@ -112,7 +112,7 @@ func (ga *spriteAnim) play(anim string, loop bool) {
 	ga.playing = true
 }
 
-func (ga *spriteAnim) update(dt float64, phys *player) {
+func (ga *spriteAnim) update(dt float64, phys *actor) {
 	if !ga.playing {
 		return
 	}

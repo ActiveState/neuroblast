@@ -17,7 +17,7 @@ import (
 
 const playerVel float64 = 100
 const bulletVel float64 = 320
-const showDebug bool = true
+const showDebug bool = false
 
 func drawRect(imd *imdraw.IMDraw, r pixel.Rect) {
 

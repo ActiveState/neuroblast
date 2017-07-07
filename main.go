@@ -18,6 +18,9 @@ import (
 const playerVel float64 = 100
 const bulletVel float64 = 320
 const showDebug bool = false
+const enemyDmg int = 10
+const playerDmg int = 20
+const health = 100
 
 func drawRect(imd *imdraw.IMDraw, r pixel.Rect) {
 
@@ -134,6 +137,7 @@ func run() {
 
 		cooldown:  0.1,
 		canfire:   true,
+		health:    health,
 		vel:       pixel.ZV,
 		pos:       pixel.V(320, 600),
 		rect:      pixel.R(0, 0, 96, 184),
@@ -164,6 +168,8 @@ func run() {
 
 		cooldown: 0.1,
 		canfire:  true,
+		health:   health,
+		lives:    3,
 		vel:      pixel.ZV,
 		pos:      pixel.V(320, 100),
 		rect:     pixel.R(0, 0, 96, 100),
@@ -296,6 +302,11 @@ func run() {
 				enemy.hitSpot = pixel.R(0, 0, 96, 100)
 				enemy.hitSpot = enemy.hitSpot.Moved(b.rect.Center().Sub(pixel.V(48, 50)))
 				enemy.hitAnim.play("Hit", false)
+				enemy.health -= playerDmg
+				if enemy.health <= 0 && !enemy.blowAnim.playing {
+					enemy.blowAnim.play("Explode", false)
+					enemy = nil
+				}
 				b = nil
 			}
 
@@ -319,6 +330,10 @@ func run() {
 				player.hitSpot = pixel.R(0, 0, 96, 100)
 				player.hitSpot = player.hitSpot.Moved(b.rect.Center().Sub(pixel.V(48, 50)))
 				player.hitAnim.play("Hit", false)
+				player.health -= enemyDmg
+				if player.health <= 0 && !player.blowAnim.playing {
+					player.blowAnim.play("Explode", false)
+				}
 				b = nil
 			}
 
@@ -380,6 +395,12 @@ func run() {
 		}
 		if player.hitAnim.playing {
 			player.hitAnim.draw(canvas, player.hitSpot)
+		}
+		if enemy.blowAnim.playing {
+			enemy.blowAnim.draw(canvas, enemy.rect)
+		}
+		if player.blowAnim.playing {
+			player.blowAnim.draw(canvas, player.rect)
 		}
 
 		for _, b := range bullets {

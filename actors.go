@@ -62,6 +62,9 @@ type player struct {
 	rect      pixel.Rect
 	hitSpot   pixel.Rect
 	spawnTime time.Time
+
+	health int
+	lives  int
 	// Function callbacks??? Channels?
 
 }

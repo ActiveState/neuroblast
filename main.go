@@ -37,6 +37,24 @@ func drawRect(imd *imdraw.IMDraw, r pixel.Rect) {
 	imd.Rectangle(1)
 }
 
+func renderStars(imd *imdraw.IMDraw, stars []*star) {
+	for _, s := range stars {
+		s.pos = s.pos.Add(pixel.V(0, -float64(s.layer+2)))
+		if s.pos.Y < 0 {
+			s.pos = pixel.V(rand.Float64()*640, 724)
+		}
+		if s.layer == 0 {
+			imd.Color = pixel.RGB(0.75, 0, 0.75).Mul(pixel.Alpha(0.5))
+		} else if s.layer == 1 {
+			imd.Color = pixel.RGB(0, 0.5, 0.75).Mul(pixel.Alpha(0.3))
+		} else {
+			imd.Color = pixel.RGB(1, 1, 1).Mul(pixel.Alpha(0.1))
+		}
+		imd.Push(pixel.V(s.pos.X, s.pos.Y))
+		imd.Circle(float64(s.layer+1), 0)
+	}
+}
+
 func run() {
 	// Tensorflow stuff
 	bundle, err := tf.LoadSavedModel("exported_brain", []string{"train"}, nil)
@@ -73,6 +91,7 @@ func run() {
 	rand.Seed(time.Now().UnixNano())
 
 	imd := imdraw.New(nil)
+	starfield := imdraw.New(nil)
 
 	// Load Bullet sprites
 	bulletpic, err := loadPicture("art/enemybullet.png")
@@ -91,6 +110,10 @@ func run() {
 	var bullets []*bullet
 	var enemybullets []*bullet
 	var enemies []*actor
+	var stars []*star
+
+	// Generate the star field for parallax
+	genStars(200, &stars)
 
 	//sheet, anims, err := loadAnimationSheet("art/python-sprites.png", "sheet.csv", 12)
 	sheet, anims, err := loadAnimationSheet("art/HeroSheet.png", "sheet.csv", 96)
@@ -424,6 +447,10 @@ func run() {
 		canvas.Clear(colornames.Black)
 		bgslice.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360+(blitStartY/2)))))
 		background.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360-(offset/2)))))
+
+		renderStars(starfield, stars)
+		starfield.Draw(canvas)
+
 		if player.idleAnim.playing {
 			player.idleAnim.draw(canvas, player.rect)
 		}
@@ -462,9 +489,9 @@ func run() {
 		}
 
 		drawRect(imd, player.rect)
-
 		imd.Draw(canvas)
 		imd.Clear()
+		starfield.Clear()
 
 		// stretch the canvas to the window
 		win.Clear(colornames.White)

@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"image"
 	"io"
+	"math/rand"
 	"os"
 	"strconv"
 
@@ -12,6 +13,11 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/pkg/errors"
 )
+
+type star struct {
+	pos   pixel.Vec
+	layer int
+}
 
 type spriteAnim struct {
 	sheet pixel.Picture
@@ -29,6 +35,16 @@ type spriteAnim struct {
 	frame pixel.Rect
 
 	sprite *pixel.Sprite
+}
+
+func genStars(numStars int, stars *[]*star) {
+	for i := 0; i < numStars; i++ {
+		newStar := &star{
+			pos:   pixel.V(rand.Float64()*640, rand.Float64()*720),
+			layer: rand.Intn(3),
+		}
+		*stars = append(*stars, newStar)
+	}
 }
 
 func loadPicture(path string) (pixel.Picture, error) {

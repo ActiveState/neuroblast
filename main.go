@@ -446,7 +446,7 @@ func run() {
 				enemy.hitAnim.draw(canvas, enemy.hitSpot)
 			}
 			if enemy.blowAnim.playing {
-				enemy.blowAnim.draw(canvas, enemy.rect)
+				enemy.blowAnim.draw(canvas, enemy.rect.Moved(pixel.V(0, -16)))
 			}
 
 			drawRect(imd, enemy.rect)

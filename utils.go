@@ -144,10 +144,10 @@ func (ga *spriteAnim) draw(t pixel.Target, rect pixel.Rect) {
 	// draw the correct frame with the correct position and direction
 	ga.sprite.Set(ga.sheet, ga.frame)
 	ga.sprite.Draw(t, pixel.IM.
-		ScaledXY(pixel.ZV, pixel.V(
-			rect.W()/ga.sprite.Frame().W(),
-			rect.H()/ga.sprite.Frame().H(),
-		)).
+		//ScaledXY(pixel.ZV, pixel.V(
+		//	rect.W()/ga.sprite.Frame().W(),
+		//	rect.H()/ga.sprite.Frame().H(),
+		//)).
 		//ScaledXY(pixel.ZV, pixel.V(-ga.dir, 1)).
 		Moved(rect.Center()),
 	)

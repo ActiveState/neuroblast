@@ -116,6 +116,10 @@ func run() {
 	if err != nil {
 		panic(err)
 	}
+	aslogopic, err := loadPicture("art/as-logo.png")
+	if err != nil {
+		panic(err)
+	}
 
 	var bullets []*bullet
 	var enemybullets []*bullet
@@ -151,6 +155,7 @@ func run() {
 	background := pixel.NewSprite(bg, bg.Bounds())
 	bgslice := pixel.NewSprite(bg, pixel.R(0, 0, 0, 0))
 	logo := pixel.NewSprite(logopic, logopic.Bounds())
+	aslogo := pixel.NewSprite(aslogopic, aslogopic.Bounds())
 
 	player := &actor{
 		idleAnim: &spriteAnim{
@@ -186,7 +191,7 @@ func run() {
 	canvas := pixelgl.NewCanvas(pixel.R(0, 0, 640, 720))
 
 	// Load Fonts
-	face, err := loadTTF("font/VeraMono.ttf", 16)
+	face, err := loadTTF("font/VeraMono.ttf", 24)
 	if err != nil {
 		panic(err)
 	}
@@ -245,6 +250,7 @@ func run() {
 			background.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360-(offset/2)))))
 
 			logo.Draw(canvas, pixel.IM.Moved(canvas.Bounds().Center().Sub(pixel.V(0, -140))))
+			aslogo.Draw(canvas, pixel.IM.Moved(canvas.Bounds().Center().Sub(pixel.V(0, 280))))
 
 			// Draw text menu options
 			if selectedOption == 0 {
@@ -261,7 +267,7 @@ func run() {
 				menutxt.WriteString("  ")
 			}
 			menutxt.WriteString("EXIT")
-			menutxt.Draw(canvas, pixel.IM.Moved(pixel.V(280, -480)))
+			menutxt.Draw(canvas, pixel.IM.Moved(pixel.V(260, -480)))
 			menutxt.Clear()
 			menutxt.Dot = txt.Orig
 

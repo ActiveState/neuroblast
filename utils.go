@@ -4,13 +4,17 @@ import (
 	"encoding/csv"
 	"image"
 	"io"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"strconv"
 
+	"golang.org/x/image/font"
+
 	_ "image/png"
 
 	"github.com/faiface/pixel"
+	"github.com/golang/freetype/truetype"
 	"github.com/pkg/errors"
 )
 
@@ -45,6 +49,33 @@ func genStars(numStars int, stars *[]*star) {
 		}
 		*stars = append(*stars, newStar)
 	}
+}
+
+func loadTTF(path string, size float64) (font.Face, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	bytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	//font, err := sfnt.Parse(bytes)
+
+	font, err := truetype.Parse(bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return truetype.NewFace(font, &truetype.Options{
+		Size:              size,
+		GlyphCacheEntries: 1,
+	}), nil
+
+	//return font, nil
 }
 
 func loadPicture(path string) (pixel.Picture, error) {

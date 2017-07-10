@@ -86,7 +86,7 @@ else:
 
 init_stars(screen)
 # Initial game state is menu
-state = gamestates.Menu()
+state = gamestates.Menu(None)
 
 scrollSpeed = -1
 

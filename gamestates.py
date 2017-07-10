@@ -126,7 +126,7 @@ class Play(GameState):
                         utils.trainedBrain = self.brain
                         if (netmodel == 1):
                             self.brain.train()  # Train the tensorflow version
-                    return Menu()
+                    return Menu(self.brain)
                         
         if self.trainingMode:
             self.brain.learn()
@@ -135,7 +135,7 @@ class Play(GameState):
             if (self.trainingMode):
                 self.brain.learn()
                 utils.trainedBrain = self.brain
-                return Menu()
+                return Menu(None)
             else:
                 return GameOver(self.score) 
 
@@ -167,7 +167,7 @@ class Leaderboard(GameState):
         leaderboard.DisplayLeaderBoard(screen,self.highscores,self.name)
         for event in event_queue:
             if event.type == pygame.KEYDOWN:
-                nextState = Menu()
+                nextState = Menu(None)
         
         
         return nextState
@@ -177,8 +177,9 @@ class Leaderboard(GameState):
 # While that object exists, it processes stuff
 # Only one "GameState" object can exist at one time
 class Menu(GameState):
-    def __init__(self):
+    def __init__(self, brain):
         self.menu_selection = 2
+        self.brain = brain
         self.logo = pygame.image.load("art/neuro-blast_logo.png")
         self.intel = pygame.image.load("art/Intel-logo_blue.png")
         self.activestate = pygame.image.load("art/as-logo.png")
@@ -219,4 +220,30 @@ class Menu(GameState):
                         nextState = Play(True)
                     else:
                         nextState = None
+                if (event.type == pygame.KEYDOWN and event.key == pygame.K_x):
+                    self.ExportModel()
         return nextState
+
+    def ExportModel(self):
+        import keras.backend as K
+        from tensorflow.python.saved_model import builder as saved_model_builder
+        from tensorflow.python.saved_model import utils
+        from tensorflow.python.saved_model import tag_constants, signature_constants
+        from tensorflow.python.saved_model.signature_def_utils_impl import build_signature_def, predict_signature_def
+        from tensorflow.contrib.session_bundle import exporter
+
+        print "EXPORTING MODEL..."
+
+        export_path = 'exported_brain'
+        builder = saved_model_builder.SavedModelBuilder(export_path)
+
+        signature = predict_signature_def(inputs={'inputs': self.brain.keras.input},
+                                    outputs={'outputs': self.brain.keras.output})
+
+        with K.get_session() as sess:
+            builder.add_meta_graph_and_variables(sess=sess,
+                                            tags=[tag_constants.TRAINING],
+                                            signature_def_map={'predict': signature})
+            builder.save()
+
+        print "...done!"

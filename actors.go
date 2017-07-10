@@ -36,13 +36,6 @@ func (b *baseActor) TakeDamage(dmg int) {
 	}
 }
 
-/*	phys := &gopherPhys{
-	gravity:   -512,
-	runSpeed:  64,
-	jumpSpeed: 192,
-	rect:      pixel.R(-6, -7, 6, 7),
-}*/
-
 type bullet struct {
 	pos    pixel.Vec
 	vel    pixel.Vec
@@ -65,6 +58,11 @@ type actor struct {
 
 	health int
 	lives  int
-	// Function callbacks??? Channels?
+	score  int
 
+	blinking    bool
+	blinktime   float64
+	blinkcycles int
+	blinks      int
+	blinkon     bool
 }

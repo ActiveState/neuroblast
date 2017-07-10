@@ -466,8 +466,10 @@ func run() {
 						enemy.hitSpot = enemy.hitSpot.Moved(b.rect.Center().Sub(pixel.V(48, 50)))
 						enemy.hitAnim.play("Hit", false)
 						enemy.health -= playerDmg
+						player.score += 50
 						if enemy.health <= 0 && !enemy.blowAnim.playing {
 							enemy.blowAnim.play("Explode", false)
+							player.score += 200
 						}
 						b = nil
 					}
@@ -602,7 +604,7 @@ func run() {
 			starfield.Clear()
 
 			// Text Rendering
-			s := fmt.Sprintf("Score: %d Health: %d Lives: %d", 0, player.health, player.lives)
+			s := fmt.Sprintf("Score: %d Health: %d Lives: %d", player.score, player.health, player.lives)
 			txt.WriteString(s)
 			txt.Draw(canvas, pixel.IM.Moved(pixel.V(0, 0)))
 			txt.Clear()

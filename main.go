@@ -191,7 +191,7 @@ func run() {
 	canvas := pixelgl.NewCanvas(pixel.R(0, 0, 640, 720))
 
 	// Load Fonts
-	face, err := loadTTF("font/VeraMono.ttf", 24)
+	face, err := loadTTF("font/DeValencia-Regular.ttf", 24)
 	if err != nil {
 		panic(err)
 	}

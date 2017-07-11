@@ -34,7 +34,7 @@ scores = db.scores
 
 def DisplayLeaderBoard(screen, highscores, name):
     y = 100
-    displaytext("TOP PLAYERS", 16, 320, 50, WHITE, screen)
+    displaytext("TOP GOPHERS", 16, 320, 50, WHITE, screen)
     for s in highscores:
         if s['name'] == name:
             color = (255, 255, 0) # YELLOW

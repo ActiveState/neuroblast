@@ -214,7 +214,9 @@ func run() {
 	selectedOption := 0
 	topY := 0 // As soon as topY because -720, next frame, flip it back to hscale-720
 
-	for !win.Closed() {
+	quit := false
+
+	for !win.Closed() && !quit {
 		dt := time.Since(last).Seconds()
 		last = time.Now()
 
@@ -287,6 +289,9 @@ func run() {
 				if selectedOption == 0 {
 					gameState = play
 				}
+				if selectedOption == 1 {
+					quit = true
+				}
 			}
 
 		}
@@ -347,6 +352,13 @@ func run() {
 
 			// control the gopher with keys
 			ctrl := pixel.ZV
+			if win.Pressed(pixelgl.KeyEscape) {
+				player.health = 100
+				player.lives = 3
+				player.score = 0
+				gameState = menu
+			}
+
 			if win.Pressed(pixelgl.KeyLeft) {
 				ctrl.X = -1 * playerVel * dt
 			}

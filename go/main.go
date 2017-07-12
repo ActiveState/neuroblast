@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"time"
 
 	"math"
 
+	"github.com/boltdb/bolt"
 	tf "github.com/tensorflow/tensorflow/tensorflow/go"
 
 	"github.com/faiface/pixel"
@@ -26,6 +28,8 @@ const health = 100
 const (
 	menu = iota
 	play
+	gameover
+	leaderboard
 )
 
 func drawRect(imd *imdraw.IMDraw, r pixel.Rect) {
@@ -62,6 +66,22 @@ func renderStars(imd *imdraw.IMDraw, stars []*star) {
 }
 
 func run() {
+	// Open the scores DB
+	db, err := bolt.Open("scores.db", 0600, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	// Create the scores bucket if it doesn't exist
+	db.Update(func(tx *bolt.Tx) error {
+		_, err := tx.CreateBucketIfNotExists([]byte("scores"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
+		return nil
+	})
+
 	// Tensorflow stuff
 	bundle, err := tf.LoadSavedModel("exported_brain", []string{"train"}, nil)
 	if err != nil {
@@ -177,13 +197,19 @@ func run() {
 			dir:   +1,
 		},
 
-		cooldown: 0.1,
-		canfire:  true,
-		health:   health,
-		lives:    3,
-		vel:      pixel.ZV,
-		pos:      pixel.V(320, 100),
-		rect:     pixel.R(0, 0, 96, 100),
+		cooldown:    0.1,
+		canfire:     true,
+		health:      health,
+		lives:       0,
+		vel:         pixel.ZV,
+		pos:         pixel.V(320, 100),
+		rect:        pixel.R(0, 0, 96, 100),
+		blinkcycles: 12,
+		blinking:    false,
+		blinkon:     false,
+		blinks:      0,
+		blinktime:   0.5,
+		blinkcount:  0,
 	}
 	player.idleAnim.play("Idle", true)
 	player.rect = player.rect.Moved(player.pos)
@@ -215,12 +241,122 @@ func run() {
 	topY := 0 // As soon as topY because -720, next frame, flip it back to hscale-720
 
 	quit := false
+	var topScores []kv
+	var playerName string
 
 	for !win.Closed() && !quit {
 		dt := time.Since(last).Seconds()
 		last = time.Now()
 
-		if gameState == menu {
+		if gameState == leaderboard {
+			menutxt.Dot = menutxt.Orig
+			txt.Dot = txt.Orig
+			menutxt.WriteString("TOP GOPHERS\n\n")
+			if win.JustReleased(pixelgl.KeyEnter) {
+				gameState = menu
+			}
+
+			i := 0
+			for _, kv := range topScores {
+				fmt.Printf("%s, %d\n", kv.Key, kv.Value)
+
+				line := fmt.Sprintf("%s : %d", kv.Key, kv.Value)
+				txt.Dot.X -= txt.BoundsOf(line).W()
+				fmt.Fprintln(txt, line)
+
+				i++
+				if i == 10 {
+					break
+				}
+			}
+
+			// UPDATE THE BACKGROUND SCROLLING
+			topY += scrollSpeed
+			height := 720
+			offset := (topY + height) - 8000 // If topY becomes negative, we use this to seamlessly blit until it clears itself up
+			if offset < 0 {
+				offset = 0
+			}
+			y := topY
+			blitStartY := 0
+			if topY+height >= 8000 {
+				blitStartY = 720 - offset
+				height = 720 - offset
+				y = 8000 - height
+
+				//fmt.Printf("Wrap: offset: %d blitStart: %d height: %d y: %d\n", offset, blitStartY, height, y)
+				bgslice.Set(bg, pixel.R(0, 0, 640, float64(offset)))
+			}
+			//		background.Set(bg, pixel.R(0, float64(y+height+1), 640, float64(y)))
+			background.Set(bg, pixel.R(0, float64(y), 640, float64(y+height)))
+			//fmt.Println(y)
+
+			if topY >= 8000 {
+				topY = 0
+			}
+
+			// draw the scene to the canvas
+			canvas.Clear(colornames.Black)
+			bgslice.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360+(blitStartY/2)))))
+			background.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360-(offset/2)))))
+
+			txt.Draw(canvas, pixel.IM.Moved(pixel.V(300, -96)))
+			menutxt.Draw(canvas, pixel.IM.Moved(pixel.V(0, 320)))
+			menutxt.Clear()
+			txt.Clear()
+		} else if gameState == gameover {
+			menutxt.Dot = menutxt.Orig
+			menutxt.WriteString("GAME OVER\n\n")
+			menutxt.Dot.X -= menutxt.BoundsOf("GAME OVER").W()
+			menutxt.WriteString("ENTER YOUR NAME:")
+			txt.WriteString(win.Typed())
+			playerName += win.Typed()
+			if win.JustReleased(pixelgl.KeyEnter) {
+				err := saveScore(db, playerName, player.score)
+				if err != nil {
+					panic(err)
+				}
+				player.score = 0
+				playerName = ""
+				topScores = getScores(db)
+				gameState = leaderboard
+			}
+
+			// UPDATE THE BACKGROUND SCROLLING
+			topY += scrollSpeed
+			height := 720
+			offset := (topY + height) - 8000 // If topY becomes negative, we use this to seamlessly blit until it clears itself up
+			if offset < 0 {
+				offset = 0
+			}
+			y := topY
+			blitStartY := 0
+			if topY+height >= 8000 {
+				blitStartY = 720 - offset
+				height = 720 - offset
+				y = 8000 - height
+
+				//fmt.Printf("Wrap: offset: %d blitStart: %d height: %d y: %d\n", offset, blitStartY, height, y)
+				bgslice.Set(bg, pixel.R(0, 0, 640, float64(offset)))
+			}
+			//		background.Set(bg, pixel.R(0, float64(y+height+1), 640, float64(y)))
+			background.Set(bg, pixel.R(0, float64(y), 640, float64(y+height)))
+			//fmt.Println(y)
+
+			if topY >= 8000 {
+				topY = 0
+			}
+
+			// draw the scene to the canvas
+			canvas.Clear(colornames.Black)
+			bgslice.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360+(blitStartY/2)))))
+			background.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360-(offset/2)))))
+
+			txt.Draw(canvas, pixel.IM.Moved(pixel.V(300, -96)))
+			menutxt.Draw(canvas, pixel.IM.Moved(pixel.V(0, 320)))
+			menutxt.Clear()
+
+		} else if gameState == menu {
 			// UPDATE THE BACKGROUND SCROLLING
 			topY += scrollSpeed
 			height := 720
@@ -256,17 +392,17 @@ func run() {
 
 			// Draw text menu options
 			if selectedOption == 0 {
-				menutxt.WriteString(">>")
+				menutxt.WriteRune('\u00bb')
 			} else {
-				menutxt.WriteString("  ")
+				menutxt.WriteString(" ")
 			}
 			menutxt.WriteString("PLAY")
 			menutxt.WriteRune('\n')
 			menutxt.Dot.X = 0
 			if selectedOption == 1 {
-				menutxt.WriteString(">>")
+				menutxt.WriteRune('\u00bb')
 			} else {
-				menutxt.WriteString("  ")
+				menutxt.WriteString(" ")
 			}
 			menutxt.WriteString("EXIT")
 			menutxt.Draw(canvas, pixel.IM.Moved(pixel.V(260, -480)))
@@ -294,10 +430,7 @@ func run() {
 				}
 			}
 
-		}
-		// Gameplay State
-		// TODO: Should really be like its own object type thing
-		if gameState == play {
+		} else if gameState == play {
 
 			// Update cooldown timer
 			if !player.canfire {
@@ -333,7 +466,7 @@ func run() {
 						dir:   +1,
 					},
 
-					cooldown:  0.2,
+					cooldown:  0.1,
 					canfire:   true,
 					health:    health,
 					vel:       pixel.ZV,
@@ -356,6 +489,10 @@ func run() {
 				player.health = 100
 				player.lives = 3
 				player.score = 0
+				spawnBreak = 5.0
+				enemySpeed = -10
+				enemies = nil
+				enemybullets = nil
 				gameState = menu
 			}
 
@@ -449,8 +586,8 @@ func run() {
 				}
 
 				for _, result := range results {
-					fmt.Printf("Input: dx: %f dy: %f du: %f dv: %f\n", dx, dy, du, dv)
-					fmt.Println(result.Value().([][]float32))
+					//fmt.Printf("Input: dx: %f dy: %f du: %f dv: %f\n", dx, dy, du, dv)
+					//fmt.Println(result.Value().([][]float32))
 
 					if result.Value().([][]float32)[0][0] >= 0.5 && enemy.canfire {
 						bullet := &bullet{
@@ -514,7 +651,7 @@ func run() {
 				b.pos = b.pos.Add(b.vel.Scaled(dt))
 				b.rect = b.rect.Moved(b.vel.Scaled(dt))
 
-				if b.rect.Intersect(player.rect).Area() > 0 {
+				if b.rect.Intersect(player.rect).Area() > 0 && !player.blinking {
 					//fmt.Println("HIT")
 					player.hitSpot = pixel.R(0, 0, 96, 100)
 					player.hitSpot = player.hitSpot.Moved(b.rect.Center().Sub(pixel.V(48, 50)))
@@ -522,17 +659,34 @@ func run() {
 					player.health -= enemyDmg
 					if player.health <= 0 && !player.blowAnim.playing {
 						player.blowAnim.play("Explode", false)
+						player.lives--
+						if player.lives >= 0 {
+							player.blinkcount = 0
+							player.blinking = true
+							player.blinks = 0
+						} else {
+							// Remember to erase player score when exiting gameover
+							player.health = 100
+							player.lives = 3
+							spawnBreak = 5.0
+							enemySpeed = -10
+							enemies = nil
+							enemybullets = nil
+							gameState = gameover
+						}
 					}
 					b = nil
 				}
 
 				// Only keep on-screen bullets
-				if b != nil && b.pos.Y > 0 {
+				if b != nil && b.pos.Y > 0 && enemybullets != nil {
 					enemybullets[i] = b
 					i++
 				}
 			}
-			enemybullets = enemybullets[:i]
+			if enemybullets != nil {
+				enemybullets = enemybullets[:i]
+			}
 
 			// UPDATE THE BACKGROUND SCROLLING
 			topY += scrollSpeed
@@ -573,7 +727,22 @@ func run() {
 			renderStars(starfield, stars)
 			starfield.Draw(canvas)
 
-			if player.idleAnim.playing {
+			// Manage player blinking
+			if player.blinking {
+				player.blinkcount += dt
+				if player.blinkcount >= player.blinktime {
+					player.blinkon = !player.blinkon
+					player.blinks++
+					player.blinkcount = 0
+					if player.blinks == player.blinkcycles {
+						player.blinking = false
+						player.blinkon = false
+						player.blinks = 0
+					}
+				}
+			}
+
+			if player.idleAnim.playing && (!player.blinking || (player.blinking && player.blinkon)) {
 				player.idleAnim.draw(canvas, player.rect)
 			}
 			if player.hitAnim.playing {

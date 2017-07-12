@@ -65,4 +65,5 @@ type actor struct {
 	blinkcycles int
 	blinks      int
 	blinkon     bool
+	blinkcount  float64
 }

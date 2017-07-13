@@ -164,6 +164,7 @@ func run() {
 		Title:  "Neuro/Blast",
 		Bounds: pixel.R(0, 0, 1280, 720),
 		VSync:  true,
+		//Monitor: pixelgl.PrimaryMonitor(),
 	}
 	win, err := pixelgl.NewWindow(cfg)
 	if err != nil {
@@ -243,7 +244,7 @@ func run() {
 	var neuralnet network
 	neuralnet.NewNetwork(vizmd, graphtext, []int{4, 6, 4, 4, 1})
 
-	trainModel(&neuralnet)
+	//trainModel(&neuralnet)
 
 	last := time.Now()
 
@@ -318,14 +319,14 @@ func run() {
 			bgslice.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360+(blitStartY/2)))))
 			background.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360-(offset/2)))))
 
-			txt.Draw(canvas, pixel.IM.Moved(pixel.V(300, -96)))
-			menutxt.Draw(canvas, pixel.IM.Moved(pixel.V(0, 320)))
+			txt.Draw(canvas, pixel.IM.Moved(pixel.V(360, -96)))
+			menutxt.Draw(canvas, pixel.IM.Moved(pixel.V(-80, 320)))
 			menutxt.Clear()
 			txt.Clear()
 		} else if gameState == gameover {
 			menutxt.Dot = menutxt.Orig
 			menutxt.WriteString("GAME OVER\n\n")
-			menutxt.Dot.X -= menutxt.BoundsOf("GAME OVER").W()
+			menutxt.Dot.X -= menutxt.BoundsOf("GAME OVER").W() / 2
 			menutxt.WriteString("ENTER YOUR NAME:")
 			txt.WriteString(win.Typed())
 			playerName += win.Typed()
@@ -370,8 +371,8 @@ func run() {
 			bgslice.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360+(blitStartY/2)))))
 			background.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360-(offset/2)))))
 
-			txt.Draw(canvas, pixel.IM.Moved(pixel.V(300, -96)))
-			menutxt.Draw(canvas, pixel.IM.Moved(pixel.V(0, 320)))
+			txt.Draw(canvas, pixel.IM.Moved(pixel.V(280, -96)))
+			menutxt.Draw(canvas, pixel.IM.Moved(pixel.V(-80, 320)))
 			menutxt.Clear()
 
 		} else if gameState == menu {
@@ -592,6 +593,8 @@ func run() {
 				du = float32((enemy.vel.X - player.vel.X) / 60)
 				dv = -float32((enemy.vel.Y - player.vel.Y) / 60)
 
+				neuralnet.Think([]float64{float64(dx), float64(dy), float64(du), float64(dv)})
+
 				// Enemy shooting logic - This is the TensorFlow bit
 				var column *tf.Tensor
 				if column, err = tf.NewTensor([1][4]float32{{dx, dy, du, dv}}); err != nil {
@@ -682,6 +685,7 @@ func run() {
 							player.blinkcount = 0
 							player.blinking = true
 							player.blinks = 0
+							player.health = 100
 						} else {
 							// Remember to erase player score when exiting gameover
 							player.health = 100
@@ -812,6 +816,7 @@ func run() {
 
 		// Draw the visualization neural network
 		vizcanvas.Clear(colornames.Black)
+		graphtext.Dot = graphtext.Orig
 		neuralnet.Draw()
 		vizmd.Draw(vizcanvas)
 

@@ -200,7 +200,7 @@ func run() {
 		cooldown:    0.1,
 		canfire:     true,
 		health:      health,
-		lives:       0,
+		lives:       3,
 		vel:         pixel.ZV,
 		pos:         pixel.V(320, 100),
 		rect:        pixel.R(0, 0, 96, 100),

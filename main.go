@@ -825,6 +825,7 @@ func run() {
 		graphtext.Dot = graphtext.Orig
 		neuralnet.Draw()
 		vizmd.Draw(vizcanvas)
+		vizmd.Clear()
 
 		viztext.Draw(vizcanvas, pixel.IM.Moved(pixel.V(-160, 320)))
 		viztext.Clear()

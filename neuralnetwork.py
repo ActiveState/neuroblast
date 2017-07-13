@@ -38,6 +38,9 @@ class Synapse():
         self.x2 = x2
         self.y1 = y1
         self.y2 = y2
+        
+    def dump(self,f):
+        f.write(str(self.weight)+"\n")
 
     def draw(self,screen):
         lo = parameters.left_offset
@@ -73,6 +76,10 @@ class Neuron():
             synapse.signal = previous_layer.neurons[synapse.input_neuron_index].output
             activity += synapse.weight * synapse.signal
         self.output = sigmoid(activity)
+
+    def dump(self,f):
+        for synapse in self.synapses:
+            synapse.dump(f)
 
     def draw(self,screen,nsurf):
         for synapse in self.synapses:
@@ -110,6 +117,9 @@ class Layer():
         for neuron in self.neurons:
             neuron.draw(screen,nsurf)
 
+    def dump(self,f):
+        for neuron in self.neurons:
+            neuron.dump(f)
 
 class NeuralNetwork():
     def __init__(self, requested_layers):
@@ -146,6 +156,10 @@ class NeuralNetwork():
             else:
                 layer.think()
         return self.layers[-1].neurons[0].output
+
+    def dump(self,f):
+        for layer in self.layers:
+            layer.dump(f)
 
     def draw(self,screen):
         self.surf.fill((0,0,0))

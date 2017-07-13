@@ -224,6 +224,8 @@ class Menu(GameState):
                     self.ExportModel()
                 if (event.type == pygame.KEYDOWN and event.key == pygame.K_d):
                     self.DumpData()
+                if (event.type == pygame.KEYDOWN and event.key == pygame.K_w):
+                    self.DumpWeights()
         return nextState
 
     def ExportModel(self):
@@ -250,6 +252,12 @@ class Menu(GameState):
 
         print "...done!"
     
+    
+    def DumpWeights(self):
+        f = open('weights.csv', 'w')
+        self.brain.model.dump(f)
+        f.close()
+        
     def DumpData(self):
         f = open('traindata.csv', 'w')
         

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"math"
-	"math/rand"
 	"os"
 
 	"strconv"
@@ -54,7 +53,7 @@ func layer_left_margin(number_of_neurons int) float64 {
 }
 
 func sigmoid(x float64) float64 {
-	return 1 / (1 + math.Exp(-x))
+	return float64(1.0 / (1.0 + math.Exp(-x)))
 }
 
 func sigmoid_derivative(x float64) float64 {
@@ -70,7 +69,7 @@ func (s *synapse) Draw(surface *imdraw.IMDraw) {
 		surface.Color = pixel.RGB(1, 0, 0)
 	}
 	surface.Push(pixel.V(s.x1, s.y1), pixel.V(s.x2, s.y2))
-	surface.Line(s.weight + 1)
+	surface.Line(math.Abs(s.weight) + 1)
 }
 
 func (n *neuron) Draw(surface *imdraw.IMDraw, text *text.Text) {
@@ -83,6 +82,7 @@ func (n *neuron) Draw(surface *imdraw.IMDraw, text *text.Text) {
 	surface.Push(pixel.V(n.x, n.y))
 	surface.Circle(40, 0)
 	s := fmt.Sprintf("%.1f", n.output)
+	//s := fmt.Sprintf("%.1f", rand.Float64()*2)
 	text.Dot = pixel.V(n.x-20, n.y)
 	text.WriteString(s)
 }
@@ -97,16 +97,17 @@ func (n *neuron) Train(prevLayer *layer) layer {
 
 func (n *neuron) Think(prevLayer *layer) {
 	activity := 0.0
-	for _, s := range n.synapses {
-		s.signal = prevLayer.neurons[s.inputNeuronIndex].output
-		activity += s.weight * s.signal
+	for i := range n.synapses {
+		n.synapses[i].signal = prevLayer.neurons[n.synapses[i].inputNeuronIndex].output
+		activity += n.synapses[i].weight * n.synapses[i].signal
 		n.output = sigmoid(activity)
+		//fmt.Printf("NEURON THINKING OUTPUT IS %f", n.output)
 	}
 }
 
 func (l *layer) Think() {
-	for _, neuron := range l.neurons {
-		neuron.Think(l.previousLayer)
+	for i := range l.neurons {
+		l.neurons[i].Think(l.previousLayer)
 	}
 }
 
@@ -120,6 +121,19 @@ func (n *network) NewNetwork(surface *imdraw.IMDraw, text *text.Text, requested 
 	n.surface = surface
 	n.text = text
 	n.layers = make([]layer, len(requested))
+
+	f, err := os.Open("weights.csv")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close() // this needs to be after the err check
+
+	lines, err := csv.NewReader(f).ReadAll()
+	if err != nil {
+		panic(err)
+	}
+
+	wi := 0
 
 	for i := 0; i < len(requested); i++ {
 		var newLayer layer
@@ -147,7 +161,7 @@ func (n *network) NewNetwork(surface *imdraw.IMDraw, text *text.Text, requested 
 				for _, input := range newLayer.previousLayer.neurons {
 					var synapse synapse
 					synapse.inputNeuronIndex = index
-					synapse.weight = rand.Float64()
+					synapse.weight, _ = strconv.ParseFloat(lines[wi][0], 64)
 					synapse.signal = 0
 					synapse.x1 = x
 					synapse.y1 = newLayer.y
@@ -155,6 +169,7 @@ func (n *network) NewNetwork(surface *imdraw.IMDraw, text *text.Text, requested 
 					synapse.y2 = input.y
 					neuron.synapses = append(neuron.synapses, synapse)
 					index++
+					wi++
 				}
 			}
 
@@ -187,11 +202,13 @@ func (n *network) ResetErrors() {
 }
 
 func (n *network) Think(inputs []float64) float64 {
-	for _, layer := range n.layers {
+	for j, layer := range n.layers {
 		if layer.inputLayer {
 			for i := 0; i < len(inputs); i++ {
 				n.layers[0].neurons[i].output = inputs[i]
 			}
+		} else {
+			n.layers[j].Think()
 		}
 	}
 	return n.layers[len(n.layers)-1].neurons[0].output

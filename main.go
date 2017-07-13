@@ -113,6 +113,7 @@ func run() {
 		}
 	}
 	// End of tensorflow check code
+	var vizUpdate float64
 
 	rand.Seed(time.Now().UnixNano())
 
@@ -263,6 +264,8 @@ func run() {
 	for !win.Closed() && !quit {
 		dt := time.Since(last).Seconds()
 		last = time.Now()
+
+		vizUpdate += dt
 
 		viztext.Dot = viztext.Orig
 		viztext.WriteString("NEURAL NET VISUALIZATION")
@@ -593,7 +596,10 @@ func run() {
 				du = float32((enemy.vel.X - player.vel.X) / 60)
 				dv = -float32((enemy.vel.Y - player.vel.Y) / 60)
 
-				neuralnet.Think([]float64{float64(dx), float64(dy), float64(du), float64(dv)})
+				if vizUpdate >= 1 {
+					vizUpdate = 0
+					go neuralnet.Think([]float64{float64(dx), float64(dy), float64(du), float64(dv)})
+				}
 
 				// Enemy shooting logic - This is the TensorFlow bit
 				var column *tf.Tensor

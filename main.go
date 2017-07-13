@@ -215,6 +215,9 @@ func run() {
 	player.rect = player.rect.Moved(player.pos)
 
 	canvas := pixelgl.NewCanvas(pixel.R(0, 0, 640, 720))
+	vizcanvas := pixelgl.NewCanvas(pixel.R(0, 0, 640, 720))
+
+	vizmd := imdraw.New(nil)
 
 	// Load Fonts
 	face, err := loadTTF("font/DeValencia-Regular.ttf", 24)
@@ -229,6 +232,18 @@ func run() {
 
 	menutxt := text.New(canvas.Bounds().Center().Sub(pixel.V(0, 0)), atlas)
 	menutxt.Color = colornames.White
+
+	viztext := text.New(vizcanvas.Bounds().Center().Sub(pixel.V(0, 0)), atlas)
+	viztext.Color = colornames.White
+
+	graphtext := text.New(vizcanvas.Bounds().Center().Sub(pixel.V(0, 0)), atlas)
+	graphtext.Color = colornames.Black
+
+	// Viz NN
+	var neuralnet network
+	neuralnet.NewNetwork(vizmd, graphtext, []int{4, 6, 4, 4, 1})
+
+	trainModel(&neuralnet)
 
 	last := time.Now()
 
@@ -247,6 +262,9 @@ func run() {
 	for !win.Closed() && !quit {
 		dt := time.Since(last).Seconds()
 		last = time.Now()
+
+		viztext.Dot = viztext.Orig
+		viztext.WriteString("NEURAL NET VISUALIZATION")
 
 		if gameState == leaderboard {
 			menutxt.Dot = menutxt.Orig
@@ -791,9 +809,21 @@ func run() {
 			txt.Clear()
 			txt.Dot = txt.Orig
 		}
+
+		// Draw the visualization neural network
+		vizcanvas.Clear(colornames.Black)
+		neuralnet.Draw()
+		vizmd.Draw(vizcanvas)
+
+		viztext.Draw(vizcanvas, pixel.IM.Moved(pixel.V(-160, 320)))
+		viztext.Clear()
+
+		graphtext.Draw(vizcanvas, pixel.IM)
+		graphtext.Clear()
 		// stretch the canvas to the window
 		win.Clear(colornames.White)
 		canvas.Draw(win, pixel.IM.Moved(pixel.V(320, 360)))
+		vizcanvas.Draw(win, pixel.IM.Moved(pixel.V(960, 360)))
 		win.Update()
 	}
 }

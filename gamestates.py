@@ -222,6 +222,8 @@ class Menu(GameState):
                         nextState = None
                 if (event.type == pygame.KEYDOWN and event.key == pygame.K_x):
                     self.ExportModel()
+                if (event.type == pygame.KEYDOWN and event.key == pygame.K_d):
+                    self.DumpData()
         return nextState
 
     def ExportModel(self):
@@ -247,3 +249,17 @@ class Menu(GameState):
             builder.save()
 
         print "...done!"
+    
+    def DumpData(self):
+        f = open('traindata.csv', 'w')
+        
+        for k,v in self.brain.mapShots.iteritems():
+            # Convert our tuple to a numpy array
+            if k in self.brain.mapHits:
+                a = list(v)
+                myList = ','.join(map(str, a))
+                output = str(self.brain.mapHits[k])
+                f.write(myList+","+output+"\n")
+        
+        f.close()  # you can omit in most cases as the destructor will call it
+        

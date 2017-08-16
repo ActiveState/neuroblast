@@ -236,7 +236,7 @@ class Menu(GameState):
         from tensorflow.python.saved_model.signature_def_utils_impl import build_signature_def, predict_signature_def
         from tensorflow.contrib.session_bundle import exporter
 
-        print "EXPORTING MODEL..."
+        print ("EXPORTING MODEL...")
 
         export_path = 'exported_brain'
         builder = saved_model_builder.SavedModelBuilder(export_path)
@@ -250,7 +250,7 @@ class Menu(GameState):
                                             signature_def_map={'predict': signature})
             builder.save()
 
-        print "...done!"
+        print ("...done!")
     
     
     def DumpWeights(self):

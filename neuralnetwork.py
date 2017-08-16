@@ -45,8 +45,7 @@ class Synapse():
     def draw(self,screen):
         lo = parameters.left_offset
         to = parameters.top_offset
-        pygame.draw.line(screen,get_synapse_colour(self.weight),(self.x1+lo, self.y1+to), (self.x2+lo, self.y2+to),max(1,int(fabs(self.weight))))
-
+        pygame.draw.line(screen,get_synapse_colour(self.weight),(int(self.x1+lo), int(self.y1+to)), (int(self.x2+lo), int(self.y2+to)),max(1,int(fabs(self.weight))))
 
 class Neuron():
     def __init__(self, x, y, previous_layer):
@@ -87,7 +86,7 @@ class Neuron():
         
         lo = parameters.left_offset
         to = parameters.top_offset
-        pygame.draw.circle(nsurf,(180,180,200),(self.x+lo, self.y+to),parameters.neuron_radius)
+        pygame.draw.circle(nsurf,(180,180,200),(int(self.x+lo), int(self.y+to)),parameters.neuron_radius)
         displaytext(str(round(self.output, 2)), 16, self.x + 2+lo, self.y+to, BLACK, nsurf)
 
 

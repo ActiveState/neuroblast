@@ -236,11 +236,11 @@ class Enemy(Killable):
         dv = (self.vely - player_vely) / 60
 
         predict = self.brain.keras.predict(np.array([list((dx,dy,du,dv))]))
-        print "dx: "+str(dx)+" dy: "+str(dy)+" du: "+str(du)+" dv: "+str(dv)
-        print "Output: "+str(self.brain.keras.predict(np.array([list((dx,dy,du,dv))])))
+        print ("dx: "+str(dx)+" dy: "+str(dy)+" du: "+str(du)+" dv: "+str(dv))
+        print ("Output: "+str(self.brain.keras.predict(np.array([list((dx,dy,du,dv))]))))
 
         if predict >= 0.5:
-            print "FIRE!"
+            print ("FIRE!")
             
         if self.canfire:
              if (trainingMode and randrange(0,100)<10) or ((netmodel == 1 and not trainingMode and self.brain.keras.predict(np.array([list((dx,dy,du,dv))]))>=0.5) or (netmodel == 0 and not trainingMode and self.brain.model.think([dx,dy,du,dv])>=0.5)):

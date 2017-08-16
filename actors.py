@@ -34,10 +34,7 @@ enemyshootsfx = pygame.mixer.Sound('audio/EnemyShoot.wav')
 explodesfx = pygame.mixer.Sound('audio/ShipExplode.wav')
 respawnsfx = pygame.mixer.Sound('audio/Respawn.wav')
 
-# Global Init stuff should have a proper home once not placeholder art
-#spritesheet = pygame.image.load("spaceship_sprite_package_by_kryptid.png")
 spritesheet = pygame.image.load("art/python-sprites.png")
-#spritesheet.set_colorkey(spritesheet.get_at((0, 0)))
 
 class SpriteSequence(object):
     def __init__(self,name,sheet,rect,cols, rows, padding,interval, loop, cb):

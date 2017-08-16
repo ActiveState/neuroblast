@@ -47,7 +47,8 @@ def DisplayLeaderBoard(screen, highscores, name):
     displaytext("PRESS ANY KEY TO CONTINUE", 16, 320, 640, WHITE, screen)
         
     
-
+# TODO: Check if a player score exists, and instead add another entry instead of
+# overwriting. 
 def StoreScore(name,score):
     print "Storing "+name+" score: "+str(score)
     scores.insert({"name":name,"score":score,"time":str(datetime.now())})

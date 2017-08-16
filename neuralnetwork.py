@@ -104,7 +104,7 @@ class Layer():
             self.y = parameters.bottom_margin
         self.neurons = []
         x = layer_left_margin(number_of_neurons)
-        for iteration in xrange(number_of_neurons):
+        for iteration in range(number_of_neurons):
             neuron = Neuron(x, self.y, self.previous_layer)
             self.neurons.append(neuron)
             x += parameters.horizontal_distance_between_neurons

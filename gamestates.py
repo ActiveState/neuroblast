@@ -86,7 +86,7 @@ class Play(GameState):
         self.userBullets.draw(screen)
 
         enemies_hit = pygame.sprite.groupcollide(self.enemies,self.userBullets,False,True)
-        for enemy, bullets in enemies_hit.iteritems():
+        for enemy, bullets in enemies_hit.items():
             enemy.TakeDamage(10)
             for b in bullets:
                 enemy.playanim("hit",(b.rect.x,b.rect.y))
@@ -183,8 +183,8 @@ class Menu(GameState):
         self.logo = pygame.image.load("art/neuro-blast_logo.png")
         self.intel = pygame.image.load("art/Intel-logo_blue.png")
         self.activestate = pygame.image.load("art/as-logo.png")
-        self.intel = pygame.transform.smoothscale(self.intel,(self.intel.get_width()/2,self.intel.get_height()/2))
-        self.activestate = pygame.transform.smoothscale(self.activestate,(self.activestate.get_width()/2,self.activestate.get_height()/2))
+        self.intel = pygame.transform.smoothscale(self.intel,(int(self.intel.get_width()/2),int(self.intel.get_height()/2)))
+        self.activestate = pygame.transform.smoothscale(self.activestate,(int(self.activestate.get_width()/2),int(self.activestate.get_height()/2)))
         
     def update(self, screen, event_queue, dt,clock,joystick, netmodel):
         # Logos/titles

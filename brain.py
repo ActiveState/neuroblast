@@ -33,7 +33,7 @@ class Brain:
         self.keras.add(Dense(4, activation='relu'))
         self.keras.add(Dense(4, activation='relu'))
         self.keras.add(Dense(1, activation='sigmoid'))
-        self.keras.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])        
+        self.keras.compile(loss='mean_squared_error', optimizer='sgd', metrics=['accuracy'])        
         
 
     # Keras version of learning
@@ -42,14 +42,15 @@ class Brain:
         # Create a n * 4 matrix for the input data
         x = []
         y = []
-        for k,v in self.mapShots.iteritems():
+        for k,v in self.mapShots.items():
+            # Convert our tuple to a numpy array
             if k in self.mapHits:
                 a = list(v)
                 x.append(a)
                 y.append(self.mapHits[k])
         
         # Fit the data to the model        
-        self.keras.fit(x,y,epochs=150,batch_size=10)
+        self.keras.fit(x,y,nb_epoch=150,batch_size=10)
         scores = self.keras.evaluate(x, y)
         print("\n%s: %.2f%%" % (self.keras.metrics_names[1], scores[1]*100))
 
@@ -60,7 +61,7 @@ class Brain:
         x = []
         y = []
         cumulative_error = 0
-        for k,v in self.mapShots.iteritems():
+        for k,v in self.mapShots.items():
             # Convert our tuple to a numpy array
             if k in self.mapHits:
                 a = list(v)

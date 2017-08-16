@@ -150,6 +150,8 @@ class Killable(pygame.sprite.Sprite):
                 self.blinking = True
                 self.blinks = 0
                 self.health = 100 
+
+
     def Die(self):
         self.kill()
 
@@ -205,10 +207,13 @@ class Enemy(Killable):
             self.anim.play()
           
         
-    def update(self, screen, event_queue, dt, (player_x,player_y),(player_velx,player_vely), trainingMode, netmodel):
+    def update(self, screen, event_queue, dt, ppos, pvel, trainingMode, netmodel):
         if not self.alive():
             return
-            
+        
+        player_x, player_y = ppos
+        player_velx, player_vely = pvel
+    
         self.velx = math.sin((pygame.time.get_ticks()-self.spawntime)/1800) * 40 
         self.x += self.velx * dt
         self.y += self.vely * dt
@@ -332,7 +337,7 @@ class Player(Killable):
             self.vely = -SHIP_ACC
         if keys[pygame.K_DOWN] or (joystick and (joystick.get_axis(1)>DEADZONE or joystick.get_button(1))):
             self.vely = SHIP_ACC
-        if self.canfire and (keys[pygame.K_SPACE] or (joystick and joystick.get_button(11))):
+        if self.canfire and (keys[pygame.K_SPACE] or (joystick and joystick.get_button(0))):
             bul = Bullet(self.x,self.y-42,BLUE,(0,-1),320,self.bullets)
             self.canfire = False
             shootsfx.play()

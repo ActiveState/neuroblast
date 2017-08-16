@@ -50,7 +50,7 @@ def DisplayLeaderBoard(screen, highscores, name):
 # TODO: Check if a player score exists, and instead add another entry instead of
 # overwriting. 
 def StoreScore(name,score):
-    print "Storing "+name+" score: "+str(score)
+    print ("Storing "+name+" score: "+str(score))
     scores.insert({"name":name,"score":score,"time":str(datetime.now())})
     
 def GetScores():
@@ -67,7 +67,7 @@ def Test():
     scores.insert({"name":"Bob","score":1539,"time":str(datetime.now())})
     scores.insert({"name":"AAA","score":744,"time":str(datetime.now())})
 
-    print list(scores.find().sort("score",DESCENDING))
+    print (list(scores.find().sort("score",DESCENDING)))
 
 # For clearing db
 if (len(sys.argv) > 1) and (sys.argv[1] == '-clear'):

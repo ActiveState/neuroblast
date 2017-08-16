@@ -2,3 +2,5 @@
 .vscode/
 *.pyc
 data/
+boothgo
+debug

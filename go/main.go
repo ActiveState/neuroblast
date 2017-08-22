@@ -312,32 +312,35 @@ func run() {
 				}
 			}
 
-			// UPDATE THE BACKGROUND SCROLLING
-			topY += scrollSpeed
-			height := 720
-			offset := (topY + height) - 8000 // If topY becomes negative, we use this to seamlessly blit until it clears itself up
-			if offset < 0 {
-				offset = 0
-			}
-			y := topY
-			blitStartY := 0
-			if topY+height >= 8000 {
-				blitStartY = 720 - offset
-				height = 720 - offset
-				y = 8000 - height
+			/* 			// UPDATE THE BACKGROUND SCROLLING
+			   			topY += scrollSpeed
+			   			height := 720
+			   			offset := (topY + height) - 8000 // If topY becomes negative, we use this to seamlessly blit until it clears itself up
+			   			if offset < 0 {
+			   				offset = 0
+			   			}
+			   			y := topY
+			   			blitStartY := 0
+			   			if topY+height >= 8000 {
+			   				blitStartY = 720 - offset
+			   				height = 720 - offset
+			   				y = 8000 - height
 
-				bgslice.Set(bg, pixel.R(0, 0, 640, float64(offset)))
-			}
-			background.Set(bg, pixel.R(0, float64(y), 640, float64(y+height)))
+			   				bgslice.Set(bg, pixel.R(0, 0, 640, float64(offset)))
+			   			}
+			   			background.Set(bg, pixel.R(0, float64(y), 640, float64(y+height)))
 
-			if topY >= 8000 {
-				topY = 0
-			}
+			   			if topY >= 8000 {
+			   				topY = 0
+			   			}
 
-			// draw the scene to the canvas
-			canvas.Clear(colornames.Black)
-			bgslice.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360+(blitStartY/2)))))
-			background.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360-(offset/2)))))
+			   			// draw the scene to the canvas
+			   			canvas.Clear(colornames.Black)
+			   			bgslice.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360+(blitStartY/2)))))
+			   			background.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360-(offset/2)))))
+
+			*/
+			topY = renderBackground(topY, scrollSpeed, bgslice, background, bg, canvas)
 
 			txt.Draw(canvas, pixel.IM.Moved(pixel.V(360, -96)))
 			menutxt.Draw(canvas, pixel.IM.Moved(pixel.V(-80, 320)))
@@ -361,64 +364,69 @@ func run() {
 				gameState = leaderboard
 			}
 
-			// UPDATE THE BACKGROUND SCROLLING
-			topY += scrollSpeed
-			height := 720
-			offset := (topY + height) - 8000 // If topY becomes negative, we use this to seamlessly blit until it clears itself up
-			if offset < 0 {
-				offset = 0
-			}
-			y := topY
-			blitStartY := 0
-			if topY+height >= 8000 {
-				blitStartY = 720 - offset
-				height = 720 - offset
-				y = 8000 - height
+			/* 			// UPDATE THE BACKGROUND SCROLLING
+			   			topY += scrollSpeed
+			   			height := 720
+			   			offset := (topY + height) - 8000 // If topY becomes negative, we use this to seamlessly blit until it clears itself up
+			   			if offset < 0 {
+			   				offset = 0
+			   			}
+			   			y := topY
+			   			blitStartY := 0
+			   			if topY+height >= 8000 {
+			   				blitStartY = 720 - offset
+			   				height = 720 - offset
+			   				y = 8000 - height
 
-				bgslice.Set(bg, pixel.R(0, 0, 640, float64(offset)))
-			}
-			background.Set(bg, pixel.R(0, float64(y), 640, float64(y+height)))
+			   				bgslice.Set(bg, pixel.R(0, 0, 640, float64(offset)))
+			   			}
+			   			background.Set(bg, pixel.R(0, float64(y), 640, float64(y+height)))
 
-			if topY >= 8000 {
-				topY = 0
-			}
+			   			if topY >= 8000 {
+			   				topY = 0
+			   			}
 
-			// draw the scene to the canvas
-			canvas.Clear(colornames.Black)
-			bgslice.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360+(blitStartY/2)))))
-			background.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360-(offset/2)))))
+			   			// draw the scene to the canvas
+			   			canvas.Clear(colornames.Black)
+			   			bgslice.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360+(blitStartY/2)))))
+			   			background.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360-(offset/2)))))
+			*/
+
+			topY = renderBackground(topY, scrollSpeed, bgslice, background, bg, canvas)
 
 			txt.Draw(canvas, pixel.IM.Moved(pixel.V(280, -96)))
 			menutxt.Draw(canvas, pixel.IM.Moved(pixel.V(-80, 320)))
 			menutxt.Clear()
 
 		} else if gameState == menu {
-			// UPDATE THE BACKGROUND SCROLLING
-			topY += scrollSpeed
-			height := 720
-			offset := (topY + height) - 8000 // If topY becomes negative, we use this to seamlessly blit until it clears itself up
-			if offset < 0 {
-				offset = 0
-			}
-			y := topY
-			blitStartY := 0
-			if topY+height >= 8000 {
-				blitStartY = 720 - offset
-				height = 720 - offset
-				y = 8000 - height
+			/* 			// UPDATE THE BACKGROUND SCROLLING
+						topY += scrollSpeed
+						height := 720
+						offset := (topY + height) - 8000 // If topY becomes negative, we use this to seamlessly blit until it clears itself up
+						if offset < 0 {
+							offset = 0
+						}
+						y := topY
+						blitStartY := 0
+						if topY+height >= 8000 {
+							blitStartY = 720 - offset
+							height = 720 - offset
+							y = 8000 - height
 
-				bgslice.Set(bg, pixel.R(0, 0, 640, float64(offset)))
-			}
-			background.Set(bg, pixel.R(0, float64(y), 640, float64(y+height)))
+							bgslice.Set(bg, pixel.R(0, 0, 640, float64(offset)))
+						}
+						background.Set(bg, pixel.R(0, float64(y), 640, float64(y+height)))
 
-			if topY >= 8000 {
-				topY = 0
-			}
+						if topY >= 8000 {
+							topY = 0
+						}
+			 			// draw the scene to the canvas
+						canvas.Clear(colornames.Black)
+						bgslice.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360+(blitStartY/2)))))
+						background.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360-(offset/2)))))
+			*/
 
-			// draw the scene to the canvas
-			canvas.Clear(colornames.Black)
-			bgslice.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360+(blitStartY/2)))))
-			background.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360-(offset/2)))))
+			topY = renderBackground(topY, scrollSpeed, bgslice, background, bg, canvas)
 
 			logo.Draw(canvas, pixel.IM.Moved(canvas.Bounds().Center().Sub(pixel.V(0, -140))))
 			aslogo.Draw(canvas, pixel.IM.Moved(canvas.Bounds().Center().Sub(pixel.V(0, 280))))
@@ -719,38 +727,41 @@ func run() {
 				enemybullets = enemybullets[:i]
 			}
 
-			// UPDATE THE BACKGROUND SCROLLING
-			topY += scrollSpeed
-			height := 720
-			offset := (topY + height) - 8000 // If topY becomes negative, we use this to seamlessly blit until it clears itself up
-			if offset < 0 {
-				offset = 0
-			}
-			y := topY
-			blitStartY := 0
-			if topY+height >= 8000 {
-				blitStartY = 720 - offset
-				height = 720 - offset
-				y = 8000 - height
+			/* 			// UPDATE THE BACKGROUND SCROLLING
+			   			topY += scrollSpeed
+			   			height := 720
+			   			offset := (topY + height) - 8000 // If topY becomes negative, we use this to seamlessly blit until it clears itself up
+			   			if offset < 0 {
+			   				offset = 0
+			   			}
+			   			y := topY
+			   			blitStartY := 0
+			   			if topY+height >= 8000 {
+			   				blitStartY = 720 - offset
+			   				height = 720 - offset
+			   				y = 8000 - height
 
-				bgslice.Set(bg, pixel.R(0, 0, 640, float64(offset)))
-			}
-			background.Set(bg, pixel.R(0, float64(y), 640, float64(y+height)))
+			   				bgslice.Set(bg, pixel.R(0, 0, 640, float64(offset)))
+			   			}
+			   			background.Set(bg, pixel.R(0, float64(y), 640, float64(y+height)))
 
-			if topY >= 8000 {
-				topY = 0
-			}
+			   			if topY >= 8000 {
+			   				topY = 0
+			   			}
 
-			// END OF BACKGROUND SCROLLING
+			   			// END OF BACKGROUND SCROLLING
+			*/
+
+			topY = renderBackground(topY, scrollSpeed, bgslice, background, bg, canvas)
 
 			// Physics and animation updates
 			player.idleAnim.update(dt, player)
 			player.hitAnim.update(dt, player)
 			player.blowAnim.update(dt, player)
-			// draw the scene to the canvas
-			canvas.Clear(colornames.Black)
-			bgslice.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360+(blitStartY/2)))))
-			background.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360-(offset/2)))))
+			//			// draw the scene to the canvas
+			//			canvas.Clear(colornames.Black)
+			//			bgslice.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360+(blitStartY/2)))))
+			//			background.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360-(offset/2)))))
 
 			renderStars(starfield, stars)
 			starfield.Draw(canvas)

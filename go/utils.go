@@ -33,11 +33,13 @@ import (
 	"os"
 	"strconv"
 
+	"golang.org/x/image/colornames"
 	"golang.org/x/image/font"
 
 	_ "image/png"
 
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/pixelgl"
 	"github.com/golang/freetype/truetype"
 	"github.com/pkg/errors"
 )
@@ -73,6 +75,37 @@ func genStars(numStars int, stars *[]*star) {
 		}
 		*stars = append(*stars, newStar)
 	}
+}
+
+func renderBackground(topY, scrollSpeed int, bgslice, background *pixel.Sprite, bg pixel.Picture, canvas *pixelgl.Canvas) int {
+	// UPDATE THE BACKGROUND SCROLLING
+	topY += scrollSpeed
+	height := 720
+	offset := (topY + height) - 8000 // If topY becomes negative, we use this to seamlessly blit until it clears itself up
+	if offset < 0 {
+		offset = 0
+	}
+	y := topY
+	blitStartY := 0
+	if topY+height >= 8000 {
+		blitStartY = 720 - offset
+		height = 720 - offset
+		y = 8000 - height
+
+		bgslice.Set(bg, pixel.R(0, 0, 640, float64(offset)))
+	}
+	background.Set(bg, pixel.R(0, float64(y), 640, float64(y+height)))
+
+	if topY >= 8000 {
+		topY = 0
+	}
+
+	// draw the scene to the canvas
+	canvas.Clear(colornames.Black)
+	bgslice.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360+(blitStartY/2)))))
+	background.Draw(canvas, pixel.IM.Moved(pixel.V(320, float64(360-(offset/2)))))
+
+	return topY
 }
 
 func loadTTF(path string, size float64) (font.Face, error) {

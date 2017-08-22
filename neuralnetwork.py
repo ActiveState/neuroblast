@@ -27,7 +27,72 @@ from math import fabs
 from formulae import sigmoid, sigmoid_derivative, random_weight, get_synapse_colour, adjust_line_to_perimeter_of_circle, layer_left_margin
 import parameters
 from utils import *
+import keras.backend as K
 
+# From: https://github.com/philipperemy/keras-visualize-activations
+def get_activations(model, model_inputs, print_shape_only=False, layer_name=None):
+    activations = []
+    inp = model.input
+
+    model_multi_inputs_cond = True
+    if not isinstance(inp, list):
+        # only one input! let's wrap it in a list.
+        inp = [inp]
+        model_multi_inputs_cond = False
+
+    outputs = [layer.output for layer in model.layers if
+               layer.name == layer_name or layer_name is None]  # all layer outputs
+
+    funcs = [K.function(inp + [K.learning_phase()], [out]) for out in outputs]  # evaluation functions
+
+    if model_multi_inputs_cond:
+        list_inputs = []
+        list_inputs.extend(model_inputs)
+        list_inputs.append(1.)
+    else:
+        list_inputs = [model_inputs, 1.]
+
+    # Learning phase. 1 = Test mode (no dropout or batch normalization)
+    # layer_outputs = [func([model_inputs, 1.])[0] for func in funcs]
+    layer_outputs = [func(list_inputs)[0] for func in funcs]
+    for layer_activations in layer_outputs:
+        activations.append(layer_activations)
+    return activations
+
+
+surf = pygame.Surface((640,720))
+nsurf = pygame.Surface((640,720))
+nsurf.fill((255,0,255))
+nsurf.set_colorkey((255,0,255))
+
+# Draws a network using the live weights/activations from Keras/Tensorflow
+def draw_network(screen, model, model_inputs, weights):
+        surf.fill((0,0,0))
+        nsurf.fill((255,0,255))
+        graph = get_activations(model, model_inputs)
+        y = parameters.bottom_margin
+        for layer in range(len(graph)):
+            x = layer_left_margin(len(graph[layer][0]))
+            for node in range(len(graph[layer][0])):
+                if (layer+1 != len(graph)):
+                    for synapse in range(len(weights[layer+1][node])):
+                        lo = parameters.left_offset
+                        to = parameters.top_offset
+                        x2 = synapse * parameters.horizontal_distance_between_neurons + layer_left_margin(len(graph[layer+1][0]))
+                        y2 = y+parameters.vertical_distance_between_layers
+                        pygame.draw.line(surf,get_synapse_colour(weights[layer+1][node][synapse]),(int(x+lo), int(y+to)), (int(x2+lo), int(y2+to)),max(1,int(fabs(weights[layer+1][node][synapse]))))
+                lo = parameters.left_offset
+                to = parameters.top_offset
+                pygame.draw.circle(nsurf,(180,180,200),(int(x+lo), int(y+to)),parameters.neuron_radius)
+                displaytext(str(round(graph[layer][0][node], 2)), 16, x + 2+lo, y+to, BLACK, nsurf)
+                x += parameters.horizontal_distance_between_neurons
+            y += parameters.vertical_distance_between_layers
+        screen.blit(surf,(640,0))
+        screen.blit(nsurf,(640,0)) 
+
+# This home grown neural net was an initial version of the visualization as a POC
+# It is convenient for dumping debug data and prototyping, so included here for completeness
+# However this code is no longer used.
 
 class Synapse():
     def __init__(self, input_neuron_index, x1, x2, y1, y2):

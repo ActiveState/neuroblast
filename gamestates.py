@@ -30,6 +30,8 @@ import math
 import leaderboard
 import gameover
 
+
+
 # GameState object will return a new state object if it transitions
 class GameState(object):
     def update(self, screen, event_queue, dt, clock, joystick, netmodel):
@@ -116,7 +118,6 @@ class Play(GameState):
         displaytext("Lives: "+str(self.player.lives) , 16, 500, 20, WHITE, screen)
 
         displaytext("Neural Net Visualization", 16, 960, 20, WHITE, screen)
-        
 
         for event in event_queue:
             if event.type == pygame.KEYDOWN:

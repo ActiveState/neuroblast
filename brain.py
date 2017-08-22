@@ -5,6 +5,7 @@ from random import randrange
 import pygame
 
 from neuralnetwork import NeuralNetwork
+from neuralnetwork import *
 from formulae import calculate_average_error, seed_random_number_generator
 import parameters
 
@@ -19,6 +20,8 @@ class Brain:
         self.mapShots = {}
         self.mapHits  = {}
         self.trained = False
+        self.currentState = np.array([list((0,0,0,0))])
+        self.weights = []
 
         self.id = randrange(0,100)
         # create model
@@ -34,6 +37,10 @@ class Brain:
         self.keras.add(Dense(4, activation='relu'))
         self.keras.add(Dense(1, activation='sigmoid'))
         self.keras.compile(loss='mean_squared_error', optimizer='sgd', metrics=['accuracy'])        
+
+        # Initialize weights array
+        for layer in self.keras.layers:
+            self.weights.append(layer.get_weights()[0])
         
 
     # Keras version of learning
@@ -53,6 +60,11 @@ class Brain:
         self.keras.fit(x,y,nb_epoch=150,batch_size=10)
         scores = self.keras.evaluate(x, y)
         print("\n%s: %.2f%%" % (self.keras.metrics_names[1], scores[1]*100))
+
+        # Cache trained weights for visualization
+        # Element 0 is weights, 1 is biases
+        for layer in self.keras.layers:
+            self.weights.append(layer.get_weights()[0])
 
     # "Home grown" Neural Net implementation
     def learn(self):
@@ -80,4 +92,5 @@ class Brain:
         self.mapHits[bullet] = 0
 
     def draw(self,screen):
-        self.model.draw(screen)
+        draw_network(screen, self.keras,self.currentState, self.weights)
+        #self.model.draw(screen)

@@ -1,3 +1,27 @@
+/*The MIT License (MIT)
+
+Copyright (c) 2017 ActiveState Software Inc.
+
+Written by Pete Garcin @rawktron
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.*/
+
 package main
 
 import (
@@ -150,7 +174,6 @@ func run() {
 	// Generate the star field for parallax
 	genStars(200, &stars)
 
-	//sheet, anims, err := loadAnimationSheet("art/python-sprites.png", "sheet.csv", 12)
 	sheet, anims, err := loadAnimationSheet("art/HeroSheet.png", "sheet.csv", 96)
 	if err != nil {
 		panic(err)
@@ -165,7 +188,6 @@ func run() {
 		Title:  "Neuro/Blast",
 		Bounds: pixel.R(0, 0, 1280, 720),
 		VSync:  true,
-		//Monitor: pixelgl.PrimaryMonitor(),
 	}
 	win, err := pixelgl.NewWindow(cfg)
 	if err != nil {
@@ -245,8 +267,6 @@ func run() {
 	var neuralnet network
 	neuralnet.NewNetwork(vizmd, graphtext, []int{4, 6, 4, 4, 1})
 
-	//trainModel(&neuralnet)
-
 	last := time.Now()
 
 	scrollSpeed := 1
@@ -306,12 +326,9 @@ func run() {
 				height = 720 - offset
 				y = 8000 - height
 
-				//fmt.Printf("Wrap: offset: %d blitStart: %d height: %d y: %d\n", offset, blitStartY, height, y)
 				bgslice.Set(bg, pixel.R(0, 0, 640, float64(offset)))
 			}
-			//		background.Set(bg, pixel.R(0, float64(y+height+1), 640, float64(y)))
 			background.Set(bg, pixel.R(0, float64(y), 640, float64(y+height)))
-			//fmt.Println(y)
 
 			if topY >= 8000 {
 				topY = 0
@@ -358,12 +375,9 @@ func run() {
 				height = 720 - offset
 				y = 8000 - height
 
-				//fmt.Printf("Wrap: offset: %d blitStart: %d height: %d y: %d\n", offset, blitStartY, height, y)
 				bgslice.Set(bg, pixel.R(0, 0, 640, float64(offset)))
 			}
-			//		background.Set(bg, pixel.R(0, float64(y+height+1), 640, float64(y)))
 			background.Set(bg, pixel.R(0, float64(y), 640, float64(y+height)))
-			//fmt.Println(y)
 
 			if topY >= 8000 {
 				topY = 0
@@ -393,12 +407,9 @@ func run() {
 				height = 720 - offset
 				y = 8000 - height
 
-				//fmt.Printf("Wrap: offset: %d blitStart: %d height: %d y: %d\n", offset, blitStartY, height, y)
 				bgslice.Set(bg, pixel.R(0, 0, 640, float64(offset)))
 			}
-			//		background.Set(bg, pixel.R(0, float64(y+height+1), 640, float64(y)))
 			background.Set(bg, pixel.R(0, float64(y), 640, float64(y+height)))
-			//fmt.Println(y)
 
 			if topY >= 8000 {
 				topY = 0
@@ -561,10 +572,6 @@ func run() {
 			}
 
 			// UPDATE ENEMIES
-			//self.velx = math.sin((pygame.time.get_ticks()-self.spawntime)/1800) * 40
-			//self.x += self.velx * dt
-			//self.y += self.vely * dt
-
 			j := 0
 			for _, enemy := range enemies {
 
@@ -613,9 +620,6 @@ func run() {
 				}
 
 				for _, result := range results {
-					//fmt.Printf("Input: dx: %f dy: %f du: %f dv: %f\n", dx, dy, du, dv)
-					//fmt.Println(result.Value().([][]float32))
-
 					if result.Value().([][]float32)[0][0] >= 0.5 && enemy.canfire {
 						bullet := &bullet{
 							sprite: pixel.NewSprite(enemybulletpic, enemybulletpic.Bounds()),
@@ -679,7 +683,6 @@ func run() {
 				b.rect = b.rect.Moved(b.vel.Scaled(dt))
 
 				if b.rect.Intersect(player.rect).Area() > 0 && !player.blinking {
-					//fmt.Println("HIT")
 					player.hitSpot = pixel.R(0, 0, 96, 100)
 					player.hitSpot = player.hitSpot.Moved(b.rect.Center().Sub(pixel.V(48, 50)))
 					player.hitAnim.play("Hit", false)
@@ -730,12 +733,9 @@ func run() {
 				height = 720 - offset
 				y = 8000 - height
 
-				//fmt.Printf("Wrap: offset: %d blitStart: %d height: %d y: %d\n", offset, blitStartY, height, y)
 				bgslice.Set(bg, pixel.R(0, 0, 640, float64(offset)))
 			}
-			//		background.Set(bg, pixel.R(0, float64(y+height+1), 640, float64(y)))
 			background.Set(bg, pixel.R(0, float64(y), 640, float64(y+height)))
-			//fmt.Println(y)
 
 			if topY >= 8000 {
 				topY = 0

@@ -1,3 +1,27 @@
+/*The MIT License (MIT)
+
+Copyright (c) 2017 ActiveState Software Inc.
+
+Written by Pete Garcin @rawktron
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.*/
+
 package main
 
 import (
@@ -63,8 +87,6 @@ func loadTTF(path string, size float64) (font.Face, error) {
 		return nil, err
 	}
 
-	//font, err := sfnt.Parse(bytes)
-
 	font, err := truetype.Parse(bytes)
 	if err != nil {
 		return nil, err
@@ -74,8 +96,6 @@ func loadTTF(path string, size float64) (font.Face, error) {
 		Size:              size,
 		GlyphCacheEntries: 1,
 	}), nil
-
-	//return font, nil
 }
 
 func loadPicture(path string) (pixel.Picture, error) {
@@ -191,11 +211,6 @@ func (ga *spriteAnim) draw(t pixel.Target, rect pixel.Rect) {
 	// draw the correct frame with the correct position and direction
 	ga.sprite.Set(ga.sheet, ga.frame)
 	ga.sprite.Draw(t, pixel.IM.
-		//ScaledXY(pixel.ZV, pixel.V(
-		//	rect.W()/ga.sprite.Frame().W(),
-		//	rect.H()/ga.sprite.Frame().H(),
-		//)).
-		//ScaledXY(pixel.ZV, pixel.V(-ga.dir, 1)).
 		Moved(rect.Center()),
 	)
 }

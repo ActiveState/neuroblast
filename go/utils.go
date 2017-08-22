@@ -39,6 +39,7 @@ import (
 	_ "image/png"
 
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/golang/freetype/truetype"
 	"github.com/pkg/errors"
@@ -74,6 +75,24 @@ func genStars(numStars int, stars *[]*star) {
 			layer: rand.Intn(3),
 		}
 		*stars = append(*stars, newStar)
+	}
+}
+
+func renderStars(imd *imdraw.IMDraw, stars []*star) {
+	for _, s := range stars {
+		s.pos = s.pos.Add(pixel.V(0, -float64(s.layer+2)))
+		if s.pos.Y < 0 {
+			s.pos = pixel.V(rand.Float64()*640, 724)
+		}
+		if s.layer == 0 {
+			imd.Color = pixel.RGB(0.75, 0, 0.75).Mul(pixel.Alpha(0.5))
+		} else if s.layer == 1 {
+			imd.Color = pixel.RGB(0, 0.5, 0.75).Mul(pixel.Alpha(0.3))
+		} else {
+			imd.Color = pixel.RGB(1, 1, 1).Mul(pixel.Alpha(0.1))
+		}
+		imd.Push(pixel.V(s.pos.X, s.pos.Y))
+		imd.Circle(float64(s.layer+1), 0)
 	}
 }
 

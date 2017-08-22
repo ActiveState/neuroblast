@@ -91,6 +91,8 @@ class Brain:
     def record_miss(self, bullet):
         self.mapHits[bullet] = 0
 
-    def draw(self,screen):
-        draw_network(screen, self.keras,self.currentState, self.weights)
-        #self.model.draw(screen)
+    def draw(self,screen,vizmodel):
+        if (vizmodel == 1):
+            draw_network(screen, self.keras,self.currentState, self.weights)
+        else:
+            self.model.draw(screen)

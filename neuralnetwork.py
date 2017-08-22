@@ -60,6 +60,7 @@ def get_activations(model, model_inputs, print_shape_only=False, layer_name=None
     return activations
 
 
+## Global vars used for viz
 surf = pygame.Surface((640,720))
 nsurf = pygame.Surface((640,720))
 nsurf.fill((255,0,255))

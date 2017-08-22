@@ -35,22 +35,39 @@ import numpy as np
 import gamestates
 from utils import *
 import sys
+import argparse
 
 ### GLOBAL GAME INIT AND MAIN LOOP
 # Basic library initialization
 pygame.init()
 loadfont(24)
+parser = argparse.ArgumentParser()
+parser.add_argument('-f',action='store_true')
+parser.add_argument('-n',action='store_true')
+parser.add_argument('-v',action='store_true')
 
-# 0 is default, internal neural net, 1 is keras/tensorflow
-netmodel = 0
+args = parser.parse_args()
+
+# 0 is internal neural net, 1 is keras/tensorflow (default)
+netmodel = 1
+
+# VizModel is which viz method, direct Keras (1) or simulated neural net (0) (faster)
+vizmodel = 0
+
 # Configure screen TODO: Should there be a config object or something to contain this?
 resolution = (1280, 720)
 flags = pygame.DOUBLEBUF
-if (len(sys.argv) > 1) and (sys.argv[1] == '-f'):
+#if (len(sys.argv) > 1) and (sys.argv[1] == '-f'):
+if (args.f == True):
     flags |= pygame.FULLSCREEN
 
-if (len(sys.argv)>1) and (sys.argv[-1] == '-t'):
-    netmodel = 1
+# Netmodel = 1 means Keras/Tensorflow, 0 = internal simple neural net for prototyping
+#if (len(sys.argv)>1) and (sys.argv[-1] == '-n'):
+if (args.n == True):
+    netmodel = 0
+
+if (args.v == True):
+    vizmodel = 1
 
 screen = pygame.display.set_mode(resolution, flags)
 screen.set_alpha(None)
@@ -118,7 +135,7 @@ while not done:
         topY = hscale-720     
     move_and_draw_stars(screen)
     ## Gamestate update
-    state = state.update(screen, event_queue, clock.get_time()/1000.0, clock, joystick, netmodel)
+    state = state.update(screen, event_queue, clock.get_time()/1000.0, clock, joystick, netmodel,vizmodel)
     ## Trap exits from gamestate
     if state == None:
         done = True

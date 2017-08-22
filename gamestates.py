@@ -34,7 +34,7 @@ import gameover
 
 # GameState object will return a new state object if it transitions
 class GameState(object):
-    def update(self, screen, event_queue, dt, clock, joystick, netmodel):
+    def update(self, screen, event_queue, dt, clock, joystick, netmodel, vizmodel):
         return self
 
 class Play(GameState):
@@ -58,7 +58,7 @@ class Play(GameState):
         self.spawnbreak = 8
         self.trainingMode = trainingMode
 
-    def update(self, screen, event_queue, dt, clock, joystick, netmodel):
+    def update(self, screen, event_queue, dt, clock, joystick, netmodel, vizmodel):
         self.player.update(screen, event_queue, dt,joystick)
         self.enemies.update(screen, event_queue, dt, (self.player.x,self.player.y), (self.player.velx,self.player.vely), self.trainingMode, netmodel)
 
@@ -110,7 +110,7 @@ class Play(GameState):
             else:
                 self.player.anim = None
                 
-        self.brain.draw(screen)             
+        self.brain.draw(screen,vizmodel)             
         
         displaytext("FPS:{:.2f}".format(clock.get_fps()) , 16, 60, 20, WHITE, screen)
         displaytext("Score: "+str(self.score), 16, 200, 20, WHITE, screen)
@@ -147,7 +147,7 @@ class GameOver(GameState):
         self.score = score
         self.name = ""
         gameover.pressed = ""
-    def update(self,screen,event_queue,dt,clock, joystick, netmodel):
+    def update(self,screen,event_queue,dt,clock, joystick, netmodel, vizmodel):
         nextState = self        
         self.name = gameover.enter_text(event_queue,screen, 8)
         for event in event_queue:
@@ -163,7 +163,7 @@ class Leaderboard(GameState):
         self.name = name
         self.highscores = leaderboard.GetScores()
         
-    def update(self,screen,event_queue,dt,clock,joystick, netmodel):
+    def update(self,screen,event_queue,dt,clock,joystick, netmodel, vizmodel):
         nextState = self
         leaderboard.DisplayLeaderBoard(screen,self.highscores,self.name)
         for event in event_queue:
@@ -187,7 +187,7 @@ class Menu(GameState):
         self.intel = pygame.transform.smoothscale(self.intel,(int(self.intel.get_width()/2),int(self.intel.get_height()/2)))
         self.activestate = pygame.transform.smoothscale(self.activestate,(int(self.activestate.get_width()/2),int(self.activestate.get_height()/2)))
         
-    def update(self, screen, event_queue, dt,clock,joystick, netmodel):
+    def update(self, screen, event_queue, dt,clock,joystick, netmodel, vizmodel):
         # Logos/titles
         screen.blit(self.logo,(screen.get_width() / 4 - 265,screen.get_height() * 3 / 4-500))
         screen.blit(self.intel,(screen.get_width() / 4 - 300,screen.get_height()-130))

@@ -2,6 +2,8 @@
 
 Copyright (c) 2017 ActiveState Software Inc.
 
+Written by Pete Garcin @rawktron
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -28,6 +30,7 @@ from random import randrange
 import numpy as np
 
 
+# TODO Make a proper audio management class
 pygame.mixer.init()
 shootsfx = pygame.mixer.Sound('audio/HeroLaser.wav')
 hitsfx = pygame.mixer.Sound('audio/EnemyHit.wav')
@@ -83,7 +86,6 @@ class SpriteSequence(object):
                             self.playing=False
             
             if self.playing:
-                #print pos
                 surface.blit(self.sheet,pos,(self.rect.x+self.currentcol*self.rect.w+self.currentcol*self.padding,
                                         self.rect.y+self.currentrow*self.rect.h+self.currentrow*self.padding,
                                         self.rect.w,self.rect.h))
@@ -238,22 +240,13 @@ class Enemy(Killable):
 
 
         self.brain.currentState = np.array([list((dx,dy,du,dv))])
-        #predict = self.brain.keras.predict(np.array([list((dx,dy,du,dv))]))
-        #print ("dx: "+str(dx)+" dy: "+str(dy)+" du: "+str(du)+" dv: "+str(dv))
-        #print ("Output: "+str(self.brain.keras.predict(np.array([list((dx,dy,du,dv))]))))
-
-#        if predict >= 0.5:
-#            print ("FIRE!")
             
         if self.canfire:
              if (trainingMode and randrange(0,100)<10) or ((netmodel == 1 and not trainingMode and self.brain.keras.predict(np.array([list((dx,dy,du,dv))]))>=0.5) or (netmodel == 0 and not trainingMode and self.brain.model.think([dx,dy,du,dv])>=0.5)):
-#            if (trainingMode and randrange(0,100)<10) or (not trainingMode and self.brain.model.think([dx,dy,du,dv])>=0.5):
-                #enemyshootsfx.play()
                 # Cheat to do parallel visualization, sort of performance intensive
                 if (not trainingMode and netmodel == 1):
                     self.brain.model.think([dx,dy,du,dv])
                 bul = Bullet(self.x,self.y+96,RED,(0,1),160,self.bullets,self.brain)
-                #self.brain.add_shot(bul, dx/640, dy/720, du/60, dv/60)
                 self.brain.add_shot(bul, dx, dy, du, dv)
                 self.canfire = False
 

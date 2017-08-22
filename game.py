@@ -21,11 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
 # game.py
-# Eventually will hold all the core game functions, game loop etc.
-# But none of the other stuff
-# For now it will catch all everything
-
-# Excuse the mess, it's under construction
+# Core game initialization, main game loop, etc.
 
 from __future__ import division
 import pygame
@@ -57,12 +53,11 @@ vizmodel = 0
 # Configure screen TODO: Should there be a config object or something to contain this?
 resolution = (1280, 720)
 flags = pygame.DOUBLEBUF
-#if (len(sys.argv) > 1) and (sys.argv[1] == '-f'):
+
 if (args.f == True):
     flags |= pygame.FULLSCREEN
 
 # Netmodel = 1 means Keras/Tensorflow, 0 = internal simple neural net for prototyping
-#if (len(sys.argv)>1) and (sys.argv[-1] == '-n'):
 if (args.n == True):
     netmodel = 0
 

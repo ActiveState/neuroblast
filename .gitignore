@@ -4,3 +4,5 @@
 data/
 boothgo
 debug
+traindata.csv
+weights.csv

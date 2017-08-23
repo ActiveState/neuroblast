@@ -50,7 +50,7 @@ To setup the game to run on MacOS/Linux in Go 1.8:
 
 *Note: You must clone the repo into your GOPATH, or add the folder you clone into to your GOPATH in order for `dep ensure` to work.*
 
-1. `git clone https://github.com/ActiveState/boothgame.git`
+1. `git clone https://github.com/ActiveState/neuroblast.git`
 2. `cd go`
 2. `dep ensure`
 3. `go build`

@@ -97,28 +97,6 @@ func run() {
 	inputop := bundle.Graph.Operation("dense_1_input")
 	outputop := bundle.Graph.Operation("dense_5/Sigmoid")
 
-	// Tensorflow sanity check test code
-	fmt.Println(inputop.Name())
-	fmt.Println(outputop.Name())
-
-	var column *tf.Tensor
-	if column, err = tf.NewTensor([1][4]float32{{1, 1, 1, 1}}); err != nil {
-		panic(err.Error())
-	}
-
-	results, err := bundle.Session.Run(map[tf.Output]*tf.Tensor{inputop.Output(0): column}, []tf.Output{outputop.Output(0)}, nil)
-	if err != nil {
-		panic(err)
-	}
-
-	for _, result := range results {
-		fmt.Println(result.Value().([][]float32))
-
-		if result.Value().([][]float32)[0][0] > 0.5 {
-			fmt.Println("FIRE!!")
-		}
-	}
-	// End of tensorflow check code
 	var vizUpdate float64
 
 	rand.Seed(time.Now().UnixNano())
@@ -547,7 +525,6 @@ func run() {
 				i := 0
 				for _, b := range bullets {
 					if b.rect.Intersect(enemy.rect).Area() > 0 {
-						//fmt.Println("HIT")
 						enemy.hitSpot = pixel.R(0, 0, 96, 100)
 						enemy.hitSpot = enemy.hitSpot.Moved(b.rect.Center().Sub(pixel.V(48, 50)))
 						enemy.hitAnim.play("Hit", false)

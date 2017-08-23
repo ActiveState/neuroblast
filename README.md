@@ -27,7 +27,7 @@ For any package dependencies, you can either install them via pip/dep or you can
 
 To setup the game to run on Windows in Python 3:
 
-1. `git clone https://github.com/ActiveState/boothgame.git`
+1. `git clone https://github.com/ActiveState/neuroblast.git`
 2. `pip3 install -r requirements.txt`
 3. Launch `rungame.cmd` (which will launch the Mongo server).
 
@@ -35,10 +35,14 @@ To setup the game to run on Windows in Python 3:
 
 To setup the game to run on MacOS/Linux in Python 3:
 
-1. `git clone https://github.com/ActiveState/boothgame.git`
+1. `git clone https://github.com/ActiveState/neuroblast.git`
+2. `cd neuroblast`
+3. `mkdir db`
 2. `pip3 install -r requirements.txt`
-3. Launch Mongo server: `mongod --dbpath <path to data/db>`
+3. Launch Mongo server: `mongod --dbpath ./db`
 4. Launch the game `python3 game.py`
+
+*Note: If you previously had Keras installed on your machine, and had run it using a different backend, make sure you configure your Keras backend to run using TensorFlow by following these [instructions](https://keras.io/backend/).*
 
 To setup the game to run on MacOS/Linux in Go 1.8:
 
@@ -46,7 +50,7 @@ To setup the game to run on MacOS/Linux in Go 1.8:
 
 *Note: You must clone the repo into your GOPATH, or add the folder you clone into to your GOPATH in order for `dep ensure` to work.*
 
-1. `git clone https://github.com/ActiveState/boothgame.git`
+1. `git clone https://github.com/ActiveState/neuroblast.git`
 2. `cd go`
 2. `dep ensure`
 3. `go build`
@@ -84,7 +88,7 @@ Copyright (C) 2017 ActiveState. Licensed under the MIT License. See LICENSE file
 
 ## Author
 
-Written by Pete Garcin @rawktron and Tom Radcliffe.
+Written by Pete Garcin [Twitter](https://twitter.com/rawktron)/[GitHub](https://github.com/rawktron) and Tom Radcliffe.
 
 ## Contributing
 

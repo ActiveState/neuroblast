@@ -39,9 +39,11 @@ To setup the game to run on MacOS/Linux in Go 1.8:
 
 Copyright (C) 2017 ActiveState. Licensed under the MIT License. See LICENSE file for details.
 
-## Author
+## Credits
 
 Written by Pete Garcin [Twitter](https://twitter.com/rawktron)/[GitHub](https://github.com/rawktron) and Tom Radcliffe.
+
+Gopher Artwork appears courtesy of [Ashley McNamara](https://github.com/ashleymcnamara/gophers).
 
 ## Contributing
 

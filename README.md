@@ -58,11 +58,13 @@ To setup the game to run on MacOS/Linux in Go 1.8:
 
 ## Command Line Arguments
 
-There are a number of options available when running the game:
+There are a number of options available when running the game from Python:
 
 - `-n` changes the Neural Network model from using TensorFlow to using the "home grown" network model which is useful for prototyping/debugging.
 - `-f` launches the game in full screen.
 - `-v` changes the visualization method to use raw Keras/TensorFlow values. Warning: This is much slower!
+
+*Note: These options are not available in the Go version.*
 
 ## Controls
 

@@ -58,11 +58,13 @@ To setup the game to run on MacOS/Linux in Go 1.8:
 
 ## Command Line Arguments
 
-There are a number of options available when running the game:
+There are a number of options available when running the game from Python:
 
 - `-n` changes the Neural Network model from using TensorFlow to using the "home grown" network model which is useful for prototyping/debugging.
 - `-f` launches the game in full screen.
 - `-v` changes the visualization method to use raw Keras/TensorFlow values. Warning: This is much slower!
+
+*Note: These options are not available in the Go version.*
 
 ## Controls
 
@@ -86,9 +88,11 @@ Use either `SPACE` or the A button on your gamepad to fire. You can hold the but
 
 Copyright (C) 2017 ActiveState. Licensed under the MIT License. See LICENSE file for details.
 
-## Author
+## Credits
 
 Written by Pete Garcin [Twitter](https://twitter.com/rawktron)/[GitHub](https://github.com/rawktron) and Tom Radcliffe.
+
+Gopher Artwork appears courtesy of [Ashley McNamara](https://github.com/ashleymcnamara/gophers).
 
 ## Contributing
 

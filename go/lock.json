@@ -1,0 +1,116 @@
+{
+    "memo": "",
+    "projects": [
+        {
+            "name": "github.com/boltdb/bolt",
+            "branch": "master",
+            "revision": "e9cf4fae01b5a8ff89d0ec6b32f0d9c9f79aefdd",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/faiface/glhf",
+            "branch": "master",
+            "revision": "98c0391c0fd3f0b365cfe5d467ac162b79dfb002",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/faiface/mainthread",
+            "branch": "master",
+            "revision": "7127dc8993886d1ce799086ff298ff99bf258fbf",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/faiface/pixel",
+            "branch": "master",
+            "revision": "d7487f1f7abdc3e10098cb67cf458ca3fbb5acfd",
+            "packages": [
+                ".",
+                "imdraw",
+                "pixelgl",
+                "text"
+            ]
+        },
+        {
+            "name": "github.com/go-gl/gl",
+            "branch": "master",
+            "revision": "b303bcb3e83b7ef645a5104e1c2db7f8d9e8918a",
+            "packages": [
+                "v3.3-core/gl"
+            ]
+        },
+        {
+            "name": "github.com/go-gl/glfw",
+            "branch": "master",
+            "revision": "45517cf5568747f99bb4b0b4abae9fa3cd5f85ed",
+            "packages": [
+                "v3.2/glfw"
+            ]
+        },
+        {
+            "name": "github.com/go-gl/mathgl",
+            "branch": "master",
+            "revision": "9e3ea3e806141087fbb83a8a8e7038bf73eff120",
+            "packages": [
+                "mgl32"
+            ]
+        },
+        {
+            "name": "github.com/golang/freetype",
+            "branch": "master",
+            "revision": "e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4",
+            "packages": [
+                "truetype"
+            ]
+        },
+        {
+            "name": "github.com/pkg/errors",
+            "branch": "master",
+            "revision": "c605e284fe17294bda444b34710735b29d1a9d90",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/tensorflow/tensorflow",
+            "branch": "master",
+            "revision": "679bb02274de245c3ce00d2229081010c656dc3c",
+            "packages": [
+                "tensorflow/go"
+            ]
+        },
+        {
+            "name": "golang.org/x/image",
+            "branch": "master",
+            "revision": "3210c0296b49a552ad9668ede9c61008df821b94",
+            "packages": [
+                "colornames",
+                "font",
+                "math/f32",
+                "math/fixed"
+            ]
+        },
+        {
+            "name": "golang.org/x/net",
+            "branch": "master",
+            "revision": "1c05540f6879653db88113bc4a2b70aec4bd491f",
+            "packages": [
+                "html",
+                "html/atom"
+            ]
+        },
+        {
+            "name": "golang.org/x/sys",
+            "branch": "master",
+            "revision": "43e60d72a8e2bd92ee98319ba9a384a0e9837c08",
+            "packages": [
+                "unix"
+            ]
+        }
+    ]
+}

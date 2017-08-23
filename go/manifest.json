@@ -1,0 +1,22 @@
+{
+    "dependencies": {
+        "github.com/boltdb/bolt": {
+            "branch": "master"
+        },
+        "github.com/faiface/pixel": {
+            "branch": "master"
+        },
+        "github.com/golang/freetype": {
+            "branch": "master"
+        },
+        "github.com/pkg/errors": {
+            "branch": "master"
+        },
+        "github.com/tensorflow/tensorflow": {
+            "branch": "master"
+        },
+        "golang.org/x/image": {
+            "branch": "master"
+        }
+    }
+}

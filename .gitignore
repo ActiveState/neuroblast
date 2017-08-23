@@ -6,5 +6,5 @@ boothgo
 debug
 traindata.csv
 weights.csv
-go
 scores.db
+go/go

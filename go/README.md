@@ -1,4 +1,4 @@
-![NeuroBlast](neuroblast.jpg)
+![NeuroBlast](../neuroblast.jpg)
 # Overview
 NeuroBlast is a classic arcade space shooter with ML-powered AI using TensorFlow. In this short demo intended to demonstrate the accessibility of open source tools for machine learning, you can train an enemy AI using machine learning.
 

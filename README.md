@@ -76,9 +76,9 @@ Control your ship with the arrow keys or the left-analog stick with a gamepad.
 
 Use either `SPACE` or the A button on your gamepad to fire. You can hold the button down for continuous fire.
 
-### Special Menu Commands
+### Debug Menu Commands
 
-On the main menu of the Python version, you can use the following commands:
+On the main menu of the Python version, you can use the following commands to export debug data:
 
 `x` - Exports a model using the SavedModelBuilder functionality to use in the Go version  
 `w` - Exports weights.csv which are the trained weights of the current model  

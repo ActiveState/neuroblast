@@ -137,7 +137,6 @@ class Killable(pygame.sprite.Sprite):
         
         
     def TakeDamage(self, damage):
-        #Take damage fuc tion
         # Already dead!
         if self.health<=0:
             return

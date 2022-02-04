@@ -1,4 +1,4 @@
-numpy==1.13.1
+numpy==1.22.2
 Keras==1.2.0
 pymongo==3.4.0
 pygame==1.9.3

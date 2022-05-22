@@ -2,4 +2,4 @@ numpy==1.13.1
 Keras==1.2.0
 pymongo==3.4.0
 pygame==1.9.3
-tensorflow==1.2.1
+tensorflow==2.6.4
